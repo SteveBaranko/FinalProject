@@ -45,10 +45,19 @@ void sig_handler(int signum)
 	exit(EXIT_SUCCESS);
 }
 
+void sig_handler_segv(int signum)
+{
+	fprintf(stdout,"\033[?1000l");
+	//fprintf(stdout,"\033[?1001l");
+	fprintf(stdout,"Segmentation fault (core dumped)\n");
+	exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
 
 	signal(SIGINT,sig_handler);
+	signal(SIGSEGV,sig_handler_segv);
 
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
