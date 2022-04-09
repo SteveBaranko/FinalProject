@@ -30,11 +30,7 @@
 #define COUT std::cout
 #define CIN std
 
-struct termios orig_termios;
-
-void tty_raw_mode(void);
-void disableRawMode();
-void enableRawMode();
+int main();
 
 #endif
 

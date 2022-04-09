@@ -1,6 +1,6 @@
 /*****************************
  * Authors: Matty's Merry Militia
- * File name vpp.h
+ * File name vppFunc.h
  * Date created: 4/9/2022
  * File contents: This file is the main header for our project
  ****************************/
