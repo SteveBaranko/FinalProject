@@ -6,8 +6,8 @@
  ****************************/
 
 
-#ifndef VPP_H
-#define VPP_H
+#ifndef vppFunc_H
+#define vppFunc_H
 
 
 #include<string.h>
@@ -18,6 +18,8 @@
 #include<iostream>
 #include<cstdlib>
 #include<vector>
+
+#include <cstdio>
 //DLLIST AND MAP ARE NOT INCLUDED YET
 
 #include "colorPrint.h"
@@ -29,8 +31,6 @@
 #define VECTOR std::vector
 #define COUT std::cout
 #define CIN std
-
-struct termios orig_termios;
 
 void tty_raw_mode(void);
 void disableRawMode();

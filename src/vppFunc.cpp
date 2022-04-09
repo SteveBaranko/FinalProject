@@ -4,6 +4,7 @@
  * Contains the raw mode and other function definitions
 ****************************/
 
+/*
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -11,7 +12,9 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <signal.h>
+*/
 #include "../include/vppFunc.h"
+struct termios orig_termios;
 
 /*void tty_raw_mode(void){
 	struct termios tty_attr;
@@ -24,9 +27,11 @@
 	tcsetattr(0,TCSANOW,&tty_attr);
 }*/
 
+/*
 void disableRawMode(){
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&orig_termios);
 }
+*/
 
 /*void enableRawMod(){
 	tcgetattr(STDIN_FILENO, &orig_termios);
