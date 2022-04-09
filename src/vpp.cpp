@@ -5,7 +5,7 @@
  * File Contents: This file contains the main function
 *************************/
 
-#include "../include/vpp.h"
+#include "../include/vppFunc.h"
 
 int main(){
 	return 0;
