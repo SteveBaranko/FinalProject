@@ -27,15 +27,22 @@ initialize:
 # Run Compilation Command
 # Command: make vpp
 
-$(OBJ)/vppFunc.o: $(SRC)/vppFunc.cpp
+$(OBJ)/readIn.o: $(SRC)/readIn.cpp
+	$(CC) $(CXXFLAGS) -c $(SRC)/readIn.cpp -o $@
+
+$(OBJ)/printTxt.o: $(SRC)/printTxt.cpp
+	$(CC) $(CXXFLAGS) -c $(SRC)/printTxt.cpp -o $@
+
+$(OBJ)/vppFunc.o: $(SRC)/vppFunc.cpp 
 	$(CC) $(CXXFLAGS) -c $(SRC)/vppFunc.cpp -o $@
 
 $(OBJ)/vpp.o: $(SRC)/vpp.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/vpp.cpp -o $@
 
+vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o $(OBJ)/printTxt.o
 
-vpp: $(OBJ)/vpp.o $(OBJ)/vppFunc.o 
-	$(CC) $(CXXFLAGS) -o $(EXE)/vpp $(OBJ)/vpp.o $(OBJ)/vppFunc.o 
+vpp: $(vppObjs) 
+	$(CC) $(CXXFLAGS) -o $(EXE)/vpp $(vppObjs) 
 
 clean:
 	rm -rf $(OBJ)/* $(EXE)/*

@@ -1,13 +1,15 @@
-// Filename: permissions_lib.c
+// Filename: readIn.cpp
 // Authors: Matty's Merry Militia
 // This file checks to see if specified file exists, is not a directory, and is accesible then checks the permissions for that file
 
-#include <errno.h>
-#include <unistd.h>
+#include "../include/readIn.h"
+
+//#include <errno.h>
+//#include <unistd.h>
+//#include <dirent.h>
+
 // #include <string.h>
 // #include <stdio.h>
-#include <dirent.h>
-
 
 
 // If file does not exist return -1
@@ -71,7 +73,21 @@ int check_permissions ( char*& path ) {
 }
         
     
-    
+void open_file(VECTOR<STRING>& lines, IFSTREAM& inFile)
+{
+	// this function will receive a file stream, read the lines of the 
+	// file into a vector of strings passed by reference, then close
+	// the file
+	//
+	// The function will take in the vector to be filled and the file to
+	// read from
+	STRING read_in;
+
+	while ( inFile >> read_in )
+		lines.push_back(read_in);
+
+	inFile.close();
+}
 
 
 
