@@ -16,7 +16,8 @@
 #include "../include/vppFunc.h"
 struct termios orig_termios;
 
-/*void tty_raw_mode(void){
+/*
+void tty_raw_mode(void){
 	struct termios tty_attr;
 
 	// set raw mode
@@ -25,15 +26,13 @@ struct termios orig_termios;
 	tty_attr.c_cc[VMIN]=1;
 
 	tcsetattr(0,TCSANOW,&tty_attr);
-}*/
+}
 
-/*
 void disableRawMode(){
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&orig_termios);
 }
-*/
 
-/*void enableRawMod(){
+void enableRawMod(){
 	tcgetattr(STDIN_FILENO, &orig_termios);
 	atexit(disableRawMode);
 
@@ -41,4 +40,7 @@ void disableRawMode(){
 	raw.c_lflag &=~(ECHO|ICANON);
 
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
-}*/
+}
+*/
+
+
