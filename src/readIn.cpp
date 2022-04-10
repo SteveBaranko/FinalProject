@@ -82,9 +82,19 @@ void open_file(VECTOR<STRING>& lines, IFSTREAM& inFile)
 	// The function will take in the vector to be filled and the file to
 	// read from
 	STRING read_in;
+	char c;
 
-	while ( inFile >> read_in )
-		lines.push_back(read_in);
+	while ( inFile.get(c) ) {
+		//COUT << c;
+		//lines.push_back(read_in);
+		if ( c == '\n' ) {
+			lines.push_back(read_in);
+			read_in.clear();
+			continue;
+		}
+		read_in.push_back(c);
+	}
+	//lines.push_back(read_in);
 
 	inFile.close();
 }
