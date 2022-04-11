@@ -25,7 +25,7 @@
 #define OFSTREAM std::ofstream
 
 int check_permissions(char*& path);
-void open_file(VECTOR<STRING>& lines, IFSTREAM& inFile);
+void openFile(VECTOR<STRING>& lines, IFSTREAM& inFile);
 
 
 #endif
