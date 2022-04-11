@@ -14,25 +14,15 @@
 #include <signal.h>
 */
 #include "../include/vppFunc.h"
+
+
 struct termios orig_termios;
 
-/*
-void tty_raw_mode(void){
-	struct termios tty_attr;
-
-	// set raw mode
-	tty_attr.c_lflag &= (~(ICANON|ECHO));
-	tty_attr.c_cc[VTIME]=0;
-	tty_attr.c_cc[VMIN]=1;
-
-	tcsetattr(0,TCSANOW,&tty_attr);
-}
-
-void disableRawMode(){
+void disableRawMode(void){
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&orig_termios);
 }
 
-void enableRawMod(){
+void enableRawMode(void){
 	tcgetattr(STDIN_FILENO, &orig_termios);
 	atexit(disableRawMode);
 
@@ -41,6 +31,6 @@ void enableRawMod(){
 
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
 }
-*/
+
 
 

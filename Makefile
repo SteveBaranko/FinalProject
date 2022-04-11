@@ -1,6 +1,6 @@
 # Author: Matty's Merry Militia
 # E-mail: dadams22@nd.edu sbaranko@nd.edu ehall9@nd.edu jsteve22@nd.edu
-#	Date: 4/9/2022
+# Date: 4/9/2022
 # This is the Makefile for creating vpp and the associated 
 # libraries that would be used for vpp. 
 
@@ -33,13 +33,16 @@ $(OBJ)/readIn.o: $(SRC)/readIn.cpp
 $(OBJ)/printTxt.o: $(SRC)/printTxt.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/printTxt.cpp -o $@
 
+$(OBJ)/sigController.o: $(SRC)/sigController.cpp
+	$(CC) $(CXXFLAGS) -c $(SRC)/sigController.cpp -o $@
+
 $(OBJ)/vppFunc.o: $(SRC)/vppFunc.cpp 
 	$(CC) $(CXXFLAGS) -c $(SRC)/vppFunc.cpp -o $@
 
 $(OBJ)/vpp.o: $(SRC)/vpp.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/vpp.cpp -o $@
 
-vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o $(OBJ)/printTxt.o
+vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o $(OBJ)/printTxt.o $(OBJ)/sigController.o
 
 vpp: $(vppObjs) 
 	$(CC) $(CXXFLAGS) -o $(EXE)/vpp $(vppObjs) 

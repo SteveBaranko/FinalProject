@@ -37,9 +37,8 @@
 #define IFSTREAM std::ifstream
 #define OFSTREAM std::ofstream
 
-void tty_raw_mode(void);
-void disableRawMode();
-void enableRawMode();
+void disableRawMode(void);
+void enableRawMode(void);
 
 #endif
 

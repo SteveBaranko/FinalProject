@@ -73,7 +73,7 @@ int check_permissions ( char*& path ) {
 }
         
     
-void open_file(VECTOR<STRING>& lines, IFSTREAM& inFile)
+void openFile(VECTOR<STRING>& lines, IFSTREAM& inFile)
 {
 	// this function will receive a file stream, read the lines of the 
 	// file into a vector of strings passed by reference, then close
@@ -81,20 +81,22 @@ void open_file(VECTOR<STRING>& lines, IFSTREAM& inFile)
 	//
 	// The function will take in the vector to be filled and the file to
 	// read from
-	STRING read_in;
+	STRING lineStr;
 	char c;
 
+	// continually get bytes from file
+	// read them into the char c
 	while ( inFile.get(c) ) {
-		//COUT << c;
-		//lines.push_back(read_in);
+		// check for newline
 		if ( c == '\n' ) {
-			lines.push_back(read_in);
-			read_in.clear();
+			// add line to vector lines
+			lines.push_back(lineStr);
+			// clear the string lineStr
+			lineStr.clear();
 			continue;
 		}
-		read_in.push_back(c);
+		lineStr.push_back(c);
 	}
-	//lines.push_back(read_in);
 
 	inFile.close();
 }
