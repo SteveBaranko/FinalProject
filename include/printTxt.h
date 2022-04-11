@@ -29,5 +29,7 @@
 void print_terminal(VECTOR<STRING>& lines);
 void printLine( STRING& line );
 void printLine( void );
+void highlightBar( unsigned int row );
+void fileStatus( void );
 
 #endif

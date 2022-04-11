@@ -17,7 +17,8 @@ void print_terminal(VECTOR<STRING>& lines)
 	struct winsize w;	// create a struct winsize w, which will give terminal size
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
 
-	for (unsigned int i = 0; i < w.ws_row; i++) {
+	// print all the lines except for the last two
+	for (unsigned int i = 0; i+2 < w.ws_row; i++) {
 		if ( i < lines.size() ) {
 			// print the line from the file
 			printLine( lines.at(i) );
@@ -30,10 +31,13 @@ void print_terminal(VECTOR<STRING>& lines)
 			// it is very ugly and does not work with
 			// files that are bigger than the terminal
 			// size
-			if (i+1 < w.ws_row)
-				COUT << ENDL;
 		}
 	}
+
+	// print a highlight bar at the end
+	highlightBar( w.ws_col );
+	// print a message about the file
+	fileStatus();
 
 	COUT << "\033[0;0H"; // move cursor to top of terminal
 
@@ -52,5 +56,22 @@ void printLine( void )
 {
 	// this function will print a dash
 	// change this alongside the other things later
-	COUT << "-";
+	COUT << "-" << ENDL;
+}
+
+void highlightBar( unsigned int row )
+{
+	// print a highlighted bar at the end of the text editor
+	COUT << "\033[42m";
+	// print spaces for the entire row
+	for (unsigned int i = 0; i < row; i++)
+		COUT << " ";
+	COUT << "\033[m";
+	COUT << ENDL;
+}
+
+void fileStatus( void )
+{
+	// useless right now
+	COUT << "\033[m";
 }
