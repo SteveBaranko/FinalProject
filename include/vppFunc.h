@@ -39,6 +39,7 @@
 
 void disableRawMode(void);
 void enableRawMode(void);
+void getInput( Terminal& Main );
 
 #endif
 
