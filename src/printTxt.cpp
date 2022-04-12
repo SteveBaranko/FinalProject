@@ -11,8 +11,8 @@ void print_terminal(VECTOR<STRING>& lines)
 	// this function will clear the terminal screen
 	// and then print out each line from a vector of strings
 
-	COUT << "\033[2J";		// clear the screen
-	COUT << "\033[0;0H";	// move cursor to top of terminal
+	COUT << CLEAR_SCREEN;		// clear the screen
+	COUT << CURS_TO_TOP;	// move cursor to top of terminal
 
 	struct winsize w;	// create a struct winsize w, which will give terminal size
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
@@ -39,7 +39,7 @@ void print_terminal(VECTOR<STRING>& lines)
 	// print a message about the file
 	fileStatus( "file name", w.ws_row );
 
-	COUT << "\033[0;0H"; // move cursor to top of terminal
+	COUT << CURS_TO_TOP; // move cursor to top of terminal
 
 	return;
 }
@@ -62,25 +62,16 @@ void printLine( void )
 void highlightBar( unsigned int rowSz )
 {
 	// print a highlighted bar at the end of the text editor
-	COUT << "\033[42m";
+	COUT << PNT_BAR_TO_END;
 	// print spaces for the entire row
 	for (unsigned int i = 0; i < rowSz; i++)
 		COUT << " ";
-	COUT << "\033[m";
+	COUT << CLEAR_FORMAT;
 	COUT << ENDL;
 }
 
 void fileStatus( unsigned int row )
 {
 	// useless right now
-	COUT << "\033[" << row << ";0H";	
-	COUT << "\033[m";
-}
-
-void fileStatus( STRING status, unsigned int row )
-{
-	// useless right now
-	COUT << "\033[" << row << ";0H";	
-	COUT << status;
-	COUT << "\033[m";
+	COUT << CLEAR_FORMAT;
 }

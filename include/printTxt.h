@@ -26,6 +26,12 @@
 #define IFSTREAM std::ifstream
 #define OFSTREAM std::ofstream
 
+#define CLEAR_SCREEN "\033[2J"
+#define CURS_TO_TOP "\033[0;0H"
+#define PNT_BAR_TO_END "\033[042m"
+#define CLEAR_FORMAT "\033[m"
+#define ESC "\033"
+
 void print_terminal(VECTOR<STRING>& lines);
 void printLine( STRING& line );
 void printLine( void );
