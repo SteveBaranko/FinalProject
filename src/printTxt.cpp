@@ -73,5 +73,16 @@ void highlightBar( unsigned int rowSz )
 void fileStatus( unsigned int row )
 {
 	// useless right now
+	COUT << "\033[" << row << ";0H";	
 	COUT << CLEAR_FORMAT;
 }
+
+void fileStatus( STRING status, unsigned int row )
+{
+	// useless right now
+	COUT << "\033[" << row << ";0H";	
+	COUT << status;
+	COUT << CLEAR_FORMAT;
+	//COUT << "\033[m";
+}
+
