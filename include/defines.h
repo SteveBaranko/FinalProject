@@ -20,6 +20,15 @@
 #define CURS_TO_TOP "\033[0;0H"
 #define PNT_BAR_TO_END "\033[042m"
 #define CLEAR_FORMAT "\033[m"
-#define ESC "\033"
+#define CLEAR_LINE "\033[K"
+//make into functions 
+//select Graphic Rendition 
+//scroll up and scroll odwn
+//erase in line
+//make Erase in Display
+//make a cursor position function
+//cursor hide
+//some awesome text modes later
+#define CSI "\033["
 
 #endif
