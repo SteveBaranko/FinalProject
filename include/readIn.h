@@ -9,6 +9,7 @@
 #include<errno.h>
 #include<unistd.h>
 #include<dirent.h>
+#include<sys/stat.h>
 
 // C++ libraries to include
 #include<iostream>
