@@ -21,10 +21,18 @@ int main(int argc, char* argv[]){
 	}
 
 	// eventually print error for not opening file
-	if ( check_permissions( argv[1] ) < 0 ) {
-		COUT << "ERROR: Cannot open file" << ENDL;
-		return -1;
-	}
+	switch( check_permissions( argv[1] ) ) {
+            case(-1):
+		COUT << "ERROR: File <"<< argv[1] << "> does not exist" << ENDL;
+                return -1;
+            case(-2):
+		COUT << "ERROR: File <"<< argv[1] << "> is not accesible" << ENDL;
+                return -2;
+            case(-3):
+		COUT << "ERROR: File <"<< argv[1] << "> is a directory" << ENDL;
+                return -3;
+        }
+                
 
 	VECTOR<STRING> lines;
 	IFSTREAM inFile( argv[1] );

@@ -37,16 +37,10 @@ int check_permissions ( char*& path ) {
 
   
     // Check if path is to directory
-    DIR* dir = opendir(path); 
-    if ( dir != NULL ) {
-        permissions_val = -3;
-        // fprintf(stderr, "Path is directory\n");
-        closedir(dir);
-        return permissions_val;
-    }
-
-    closedir(dir);
-
+    struct stat s;
+    stat(path, &s); 
+    if (S_ISDIR(s.st_mode)) return -3;
+    
 
 
     // check if file is executable
