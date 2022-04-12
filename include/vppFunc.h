@@ -24,18 +24,12 @@
 #include "readIn.h"
 #include "sigController.h"
 
+
 #include<iostream>
 #include<fstream>
 #include<string>
 #include<vector>
 
-#define COUT std::cout
-#define CIN std::cin
-#define ENDL std::endl
-#define STRING std::string
-#define VECTOR std::vector
-#define IFSTREAM std::ifstream
-#define OFSTREAM std::ofstream
 
 void disableRawMode(void);
 void enableRawMode(void);
