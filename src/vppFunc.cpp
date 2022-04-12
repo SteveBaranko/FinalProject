@@ -32,5 +32,34 @@ void enableRawMode(void){
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
 }
 
+void getInput( Terminal& Main )
+{
+	char c;
+	CIN.get(c);
+	if (c == 'q') Main.close();
+	if (c == '\x1b') {
+		CIN.get(c);
+		if (c == '[') {
+			CIN.get(c);
+			switch (c) {
+				case 'A':
+					Main.decCursorY();
+					break;
+				case 'B':
+					Main.incCursorY();
+					break;
+				case 'C':
+					Main.incCursorX();
+					break;
+				case 'D':
+					Main.decCursorX();
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
 
 

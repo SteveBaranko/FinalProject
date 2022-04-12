@@ -26,32 +26,6 @@ void highlightBar( unsigned int rowSz );
 void fileStatus( unsigned int row );
 void fileStatus( STRING status, unsigned int row );
 
-class Cursor
-{
-	private:
-		unsigned int x;
-		unsigned int y;
-
-	public:
-		Cursor( ): x( 0 ), y( 0 ) { }
-		Cursor( unsigned int xIn, unsigned int yIn ): x( xIn ), y( yIn ) { }
-		~Cursor( ) { }
-
-		void updatePosition( unsigned int xIn, unsigned int yIn ) {
-			x = xIn;
-			y = yIn;
-		}
-
-		unsigned int getX( ) {
-			return x;
-		}
-
-		unsigned int gety( ) {
-			return y;
-		}
-	
-};
-
 class Terminal
 {
 	
@@ -60,7 +34,9 @@ class Terminal
 		unsigned int col;
 		VECTOR< STRING > lines;
 		STRING fileName;
-		Cursor curr;
+		unsigned int cursorX;
+		unsigned int cursorY;
+		bool open;
 		
 		void printLine( STRING& line )
 		{
@@ -108,9 +84,9 @@ class Terminal
 		
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), curr( ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), curr( ) { }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), curr( ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ),cursorY( 1 ), open( true ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), open( true ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), open( true ) { }
 		~Terminal( ) { }
 
 		
@@ -135,7 +111,8 @@ class Terminal
 			fileStatus( fileName, row );
 
 			//COUT << "\033[0;0H";	// move cursor to top of terminal
-			COUT << CURS_TO_TOP;
+			//COUT << CURS_TO_TOP;
+			COUT << "\033[" << cursorY << ";" << cursorX << "H";
 		}
 
 		void openFile(IFSTREAM& inFile) {
@@ -163,6 +140,34 @@ class Terminal
 			}
 
 			inFile.close();
+		}
+
+		bool isOpen( ) {
+			return open;
+		}
+
+		void close( ) {
+			open = false;
+		}
+
+		void incCursorX( ) {
+			if (cursorX < (unsigned int) col)
+				cursorX++;
+		}
+
+		void decCursorX( ) {
+			if (cursorX > 1)
+				cursorX--;
+		}
+
+		void incCursorY( ) {
+			if (cursorY < (unsigned int) row-2)
+				cursorY++;
+		}
+
+		void decCursorY( ) {
+			if (cursorY > 1)
+				cursorY--;
 		}
 
 };

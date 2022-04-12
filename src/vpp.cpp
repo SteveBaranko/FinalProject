@@ -47,11 +47,12 @@ int main(int argc, char* argv[]){
 	//print_terminal( lines );
 	Main.updateTerminal();
 
-	char c;
+	//char c;
 
-	while (1){
-		CIN.get(c);
-		if (c == 'q') break;
+	while (Main.isOpen()){
+		//CIN.get(c);
+		//if (c == 'q') Main.close();
+		getInput( Main );
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
 		Main.updateSize( w.ws_row, w.ws_col );
 		Main.updateTerminal();
