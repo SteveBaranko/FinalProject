@@ -37,7 +37,7 @@ void print_terminal(VECTOR<STRING>& lines)
 	// print a highlight bar at the end
 	highlightBar( w.ws_col );
 	// print a message about the file
-	fileStatus();
+	fileStatus( "file name", w.ws_row );
 
 	COUT << CURS_TO_TOP; // move cursor to top of terminal
 
@@ -59,18 +59,18 @@ void printLine( void )
 	COUT << "-" << ENDL;
 }
 
-void highlightBar( unsigned int row )
+void highlightBar( unsigned int rowSz )
 {
 	// print a highlighted bar at the end of the text editor
 	COUT << PNT_BAR_TO_END;
 	// print spaces for the entire row
-	for (unsigned int i = 0; i < row; i++)
+	for (unsigned int i = 0; i < rowSz; i++)
 		COUT << " ";
 	COUT << CLEAR_FORMAT;
 	COUT << ENDL;
 }
 
-void fileStatus( void )
+void fileStatus( unsigned int row )
 {
 	// useless right now
 	COUT << CLEAR_FORMAT;

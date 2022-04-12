@@ -28,16 +28,25 @@ int main(int argc, char* argv[]){
 
 	VECTOR<STRING> lines;
 	IFSTREAM inFile( argv[1] );
+ 
+	struct winsize w;	// create a struct winsize w, which will give terminal size
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
+	Terminal Main( w.ws_row, w.ws_col, argv[1] );
 
-	openFile( lines, inFile );
+	//openFile( lines, inFile );
+	Main.openFile( inFile );
 
-	print_terminal( lines );
+	//print_terminal( lines );
+	Main.updateTerminal();
 
 	char c;
 
 	while (1){
 		CIN.get(c);
 		if (c == 'q') break;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
+		Main.updateSize( w.ws_row, w.ws_col );
+		Main.updateTerminal();
 	}
 
 	COUT << "\033[2J";		// clear the screen
