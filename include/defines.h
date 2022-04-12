@@ -22,6 +22,13 @@
 #define CLEAR_FORMAT "\033[m"
 #define CLEAR_LINE "\033[K"
 //make into functions 
+//select Graphic Rendition 
+//scroll up and scroll odwn
+//erase in line
+//make Erase in Display
+//make a cursor position function
+//cursor hide
+//some awesome text modes later
 #define CSI "\033["
 
 #endif
