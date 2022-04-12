@@ -67,11 +67,13 @@ class Terminal
 		void highlightBar( unsigned int rowSz )
 		{
 			// print a highlighted bar at the end of the text editor
-			COUT << "\033[42m";
+			//COUT << "\033[42m";
+			COUT << PNT_BAR_TO_END;
 			// print spaces for the entire row
 			for (unsigned int i = 0; i < rowSz; i++)
 				COUT << " ";
-			COUT << "\033[m";
+			//COUT << "\033[m";
+			COUT << CLEAR_FORMAT;
 			COUT << ENDL;
 		}
 
@@ -87,7 +89,8 @@ class Terminal
 			// useless right now
 			COUT << "\033[" << rowEnd << ";0H";	
 			COUT << status;
-			COUT << "\033[m";
+			COUT << CLEAR_FORMAT;
+			//COUT << "\033[m";
 		}
 
 		
@@ -105,8 +108,8 @@ class Terminal
 		}
 
 		void updateTerminal() {
-			COUT << "\033[2J";		// clear the screen
-			COUT << "\033[0;0H";	// move cursor to top of terminal
+			COUT << CLEAR_SCREEN;		// clear the screen
+			COUT << CURS_TO_TOP;	// move cursor to top of terminal
 			for (unsigned int i = 0; i < (unsigned int) row-2; i++) {
 				if ( i < lines.size() ) {
 					printLine( lines.at(i) );
@@ -119,7 +122,8 @@ class Terminal
 
 			fileStatus( fileName, row );
 
-			COUT << "\033[0;0H";	// move cursor to top of terminal
+			//COUT << "\033[0;0H";	// move cursor to top of terminal
+			COUT << CURS_TO_TOP;
 		}
 
 		void openFile(IFSTREAM& inFile) {
