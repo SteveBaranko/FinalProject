@@ -15,14 +15,7 @@
 #include<fstream>
 #include<string>
 #include<vector>
-
-#define COUT std::cout
-#define CIN std::cin
-#define ENDL std::endl
-#define STRING std::string
-#define VECTOR std::vector
-#define IFSTREAM std::ifstream
-#define OFSTREAM std::ofstream
+#include "defines.h"
 
 int check_permissions(char*& path);
 void openFile(VECTOR<STRING>& lines, IFSTREAM& inFile);

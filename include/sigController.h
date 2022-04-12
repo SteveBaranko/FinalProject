@@ -15,14 +15,7 @@
 #include<vector>
 #include<csignal>
 #include<cstdlib>
-
-#define COUT std::cout
-#define CIN std::cin
-#define ENDL std::endl
-#define STRING std::string
-#define VECTOR std::vector
-#define IFSTREAM std::ifstream
-#define OFSTREAM std::ofstream
+#include "defines.h"
 
 void sig_handler(int signum);
 void setHandlers(void);
