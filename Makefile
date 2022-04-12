@@ -30,7 +30,7 @@ initialize:
 $(OBJ)/readIn.o: $(SRC)/readIn.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/readIn.cpp -o $@
 
-$(OBJ)/printTxt.o: $(SRC)/printTxt.cpp
+$(OBJ)/printTxt.o: $(SRC)/printTxt.cpp $(INC)/printTxt.h
 	$(CC) $(CXXFLAGS) -c $(SRC)/printTxt.cpp -o $@
 
 $(OBJ)/sigController.o: $(SRC)/sigController.cpp
