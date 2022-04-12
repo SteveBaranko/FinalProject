@@ -150,7 +150,7 @@ class Terminal
 			open = false;
 		}
 
-		void incCursorX( ) {
+		void incCursorX( ) { //change this function name Steve
 			if (cursorX < (unsigned int) col)
 				cursorX++;
 		}

@@ -20,6 +20,8 @@
 #define CURS_TO_TOP "\033[0;0H"
 #define PNT_BAR_TO_END "\033[042m"
 #define CLEAR_FORMAT "\033[m"
-#define ESC "\033"
+#define CLEAR_LINE "\033[K"
+//make into functions 
+#define CSI "\033["
 
 #endif
