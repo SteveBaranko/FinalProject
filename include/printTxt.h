@@ -39,6 +39,31 @@ void highlightBar( unsigned int rowSz );
 void fileStatus( unsigned int row );
 void fileStatus( STRING status, unsigned int row );
 
+class Cursor
+{
+	private:
+		unsigned int x;
+		unsigned int y;
+
+	public:
+		Cursor( ): x( 0 ), y( 0 ) { }
+		Cursor( unsigned int xIn, unsigned int yIn ): x( xIn ), y( yIn ) { }
+		~Cursor( ) { }
+
+		void updatePosition( unsigned int xIn, unsigned int yIn ) {
+			x = xIn;
+			y = yIn;
+		}
+
+		unsigned int getX( ) {
+			return x;
+		}
+
+		unsigned int gety( ) {
+			return y;
+		}
+	
+};
 
 class Terminal
 {
@@ -48,7 +73,7 @@ class Terminal
 		unsigned int col;
 		VECTOR< STRING > lines;
 		STRING fileName;
-		
+		Cursor curr;
 		
 		void printLine( STRING& line )
 		{
@@ -96,9 +121,9 @@ class Terminal
 		
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ) { }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), curr( ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), curr( ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), curr( ) { }
 		~Terminal( ) { }
 
 		
