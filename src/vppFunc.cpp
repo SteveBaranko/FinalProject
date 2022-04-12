@@ -43,16 +43,16 @@ void getInput( Terminal& Main )
 			CIN.get(c);
 			switch (c) {
 				case 'A':
-					Main.decCursorY();
+					Main.cursUp();
 					break;
 				case 'B':
-					Main.incCursorY();
+					Main.cursDown();
 					break;
 				case 'C':
-					Main.incCursorX();
+					Main.cursRight();
 					break;
 				case 'D':
-					Main.decCursorX();
+					Main.cursLeft();
 					break;
 				default:
 					break;

@@ -36,12 +36,14 @@ class Terminal
 		STRING fileName;
 		unsigned int cursorX;
 		unsigned int cursorY;
+		unsigned int offset;
 		bool open;
 		
 		void printLine( STRING& line )
 		{
 			// this function will format and print a line
 			// change this to add coloring later
+			COUT << ESC << "[2K";
 			COUT << line << ENDL;
 		}
 
@@ -49,6 +51,7 @@ class Terminal
 		{
 			// this function will print a dash
 			// change this alongside the other things later
+			COUT << ESC << "[2K";
 			COUT << "-" << ENDL;
 		}
 
@@ -84,9 +87,9 @@ class Terminal
 		
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ),cursorY( 1 ), open( true ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), open( true ) { }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), open( true ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ) { }
 		~Terminal( ) { }
 
 		
@@ -96,11 +99,11 @@ class Terminal
 		}
 
 		void updateTerminal() {
-			COUT << CLEAR_SCREEN;		// clear the screen
+			//COUT << CLEAR_SCREEN;		// clear the screen
 			COUT << CURS_TO_TOP;	// move cursor to top of terminal
 			for (unsigned int i = 0; i < (unsigned int) row-2; i++) {
-				if ( i < lines.size() ) {
-					printLine( lines.at(i) );
+				if ( i < (unsigned int) lines.size() - offset ) {
+					printLine( lines.at(i+offset) );
 				} else {
 					printLine();
 				}
@@ -112,7 +115,11 @@ class Terminal
 
 			//COUT << "\033[0;0H";	// move cursor to top of terminal
 			//COUT << CURS_TO_TOP;
-			COUT << "\033[" << cursorY << ";" << cursorX << "H";
+			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
+				COUT << "\033[" << cursorY << ";" << lines.at(cursorY-1+offset).size()+1 << "H";
+			else
+				COUT << "\033[" << cursorY << ";" << cursorX << "H";
+
 		}
 
 		void openFile(IFSTREAM& inFile) {
@@ -136,6 +143,12 @@ class Terminal
 					lineStr.clear();
 					continue;
 				}
+				// replace tabs with spaces, fix later
+				if ( c == '\t' ) {
+					lineStr.push_back(' ');
+					lineStr.push_back(' ');
+					continue;
+				}
 				lineStr.push_back(c);
 			}
 
@@ -150,24 +163,45 @@ class Terminal
 			open = false;
 		}
 
-		void incCursorX( ) {
+		void cursRight( ) {
 			if (cursorX < (unsigned int) col)
 				cursorX++;
+			// limit cursor to right by line size
+			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
+				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 		}
 
-		void decCursorX( ) {
+		void cursLeft( ) {
+			// if the cursor is beyond line, bring it back
+			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
+				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 			if (cursorX > 1)
 				cursorX--;
 		}
 
-		void incCursorY( ) {
+		void cursDown( ) {
 			if (cursorY < (unsigned int) row-2)
 				cursorY++;
+			else
+				if (offset < (unsigned int) lines.size() + 2 - row) offset++;
+			// limit cursor to only lines of the file
+			if (cursorY > (unsigned int) lines.size() - offset)
+				cursorY = (unsigned int) lines.size() - offset;
+			return;
+			// limit cursor to right by line size
+			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
+				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 		}
 
-		void decCursorY( ) {
+		void cursUp( ) {
 			if (cursorY > 1)
 				cursorY--;
+			else
+				if ( offset > 0 ) offset--;
+			return;
+			// limit cursor to right by line size
+			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
+				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 		}
 
 };
