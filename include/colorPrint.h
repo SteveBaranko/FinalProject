@@ -28,6 +28,5 @@ void setGreen();
 void setWhite();
 void setYellow();
 
-
 #endif
 

@@ -27,6 +27,9 @@ initialize:
 # Run Compilation Command
 # Command: make vpp
 
+$(OBJ)/colorPrint.o: $(SRC)/colorPrint.cpp
+	$(CC) $(CXXFLAGS) -c $(SRC)/colorPrint.cpp -o $@
+
 $(OBJ)/readIn.o: $(SRC)/readIn.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/readIn.cpp -o $@
 
