@@ -24,10 +24,10 @@ class Colors
     
 	//COUT << CSI << "38;2;229;229;16m";
         Colors(): colors( ) {
-            colors["if"]  =     "38;2;0;205;205m"; // yellow
-            colors["for"] =     "38;2;0;205;205m"; // magenta
+            colors["if"]  =     "38;2;229;229;16m"; // yellow
+            colors["for"] =     "38;2;229;229;16m"; // magenta
             colors["while"] =   "38;2;0;205;205m"; // green
-	    			colors["else"] =    "38;2;229;229;229m"; // white
+	    			colors["else"] =    "38;2;229;229;16m"; // yellow
 						colors["void"] = 		"38;2;0;205;205m"; // blue
 						colors["int"] = 		"38;2;0;205;205m"; // blue
 						colors["unsigned"]=	"38;2;0;205;205m"; // blue
