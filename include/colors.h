@@ -24,10 +24,20 @@ class Colors
     
 	//COUT << CSI << "38;2;229;229;16m";
         Colors(): colors( ) {
-            colors["if"]  =     "38;2;255;0;0m"; // cyan
-            colors["for"] =     "38;2;0;255;0m"; // red
-            colors["while"] =   "38;2;0;0;255m"; // green
-	    colors["else"] =    "38;2;229;229;229m"; // white
+            colors["if"]  =     "38;2;0;205;205m"; // yellow
+            colors["for"] =     "38;2;0;205;205m"; // magenta
+            colors["while"] =   "38;2;0;205;205m"; // green
+	    			colors["else"] =    "38;2;229;229;229m"; // white
+						colors["void"] = 		"38;2;0;205;205m"; // blue
+						colors["int"] = 		"38;2;0;205;205m"; // blue
+						colors["unsigned"]=	"38;2;0;205;205m"; // blue
+						colors["long"] = 		"38;2;0;205;205m"; // blue
+						colors["bool"] = 		"38;2;0;205;205m"; // blue
+						colors["char"] = 		"38;2;0;205;205m"; // blue
+						colors["float"] =		"38;2;0;205;205m"; // blue
+						colors["struct"] =	"38;2;0;205;205m"; // blue
+						colors["return"] =	"38;2;0;205;205m"; // blue
+						colors["include"]= "38;2;205;0;205m"; // magenta
         }
         ~Colors() { }
 

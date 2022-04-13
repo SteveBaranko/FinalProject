@@ -10,4 +10,6 @@ while (true)
 for (unsigned int i = 0; i < funny.size(); i++)
     COUT << i;
 
+no tab
+	tabbed
 
