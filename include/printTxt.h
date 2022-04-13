@@ -25,6 +25,9 @@ void printLine( void );
 void highlightBar( unsigned int rowSz );
 void fileStatus( unsigned int row );
 void fileStatus( STRING status, unsigned int row );
+void cursPos( unsigned int x, unsigned int y );
+void scrollUp( unsigned int lines ); //scrolls up x lines 
+void scrollDown( unsigned int lines); //scrolls down x lines
 
 class Terminal
 {
@@ -43,7 +46,7 @@ class Terminal
 		{
 			// this function will format and print a line
 			// change this to add coloring later
-			COUT << ESC << "[2K";
+			COUT << CSI << "2K";
 			COUT << line << ENDL;
 		}
 
@@ -51,7 +54,7 @@ class Terminal
 		{
 			// this function will print a dash
 			// change this alongside the other things later
-			COUT << ESC << "[2K";
+			COUT << CSI << "2K";
 			COUT << "-" << ENDL;
 		}
 
@@ -71,14 +74,14 @@ class Terminal
 		void fileStatus( unsigned int rowEnd )
 		{
 			// useless right now
-			COUT << "\033[" << rowEnd << ";0H";	
-			COUT << "\033[m";
+			COUT << CSI << rowEnd << ";0H";	
+			COUT << CLEAR_FORMAT;
 		}
 
 		void fileStatus( STRING status, unsigned int rowEnd )
 		{
 			// useless right now
-			COUT << "\033[" << rowEnd << ";0H";	
+			COUT << CSI << rowEnd << ";0H";	
 			COUT << status;
 			COUT << CLEAR_FORMAT;
 			//COUT << "\033[m";
@@ -116,9 +119,9 @@ class Terminal
 			//COUT << "\033[0;0H";	// move cursor to top of terminal
 			//COUT << CURS_TO_TOP;
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
-				COUT << "\033[" << cursorY << ";" << lines.at(cursorY-1+offset).size()+1 << "H";
+				COUT << CSI << cursorY << ";" << lines.at(cursorY-1+offset).size()+1 << "H";
 			else
-				COUT << "\033[" << cursorY << ";" << cursorX << "H";
+				COUT << CSI << cursorY << ";" << cursorX << "H";
 
 		}
 
