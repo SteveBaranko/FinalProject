@@ -1,0 +1,13 @@
+
+if (x == 0)
+    COUT << FUNNY; 
+else
+    COUT << ALSO FUNNY;
+
+while (true)
+    COUT << WAY FUNNY;
+
+for (unsigned int i = 0; i < funny.size(); i++)
+    COUT << i;
+
+

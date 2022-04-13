@@ -60,9 +60,7 @@ class Terminal
                                     continue;
                                 } else {
                                     //COUT << "test";
-																		COUT << CSI << "38;2;0;205;205m";
-                                    COUT << word << " ";
-																		COUT << COLORS_NORMAL;
+				    COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
                                     word.clear();
                                 }
                                 COUT << i;
@@ -76,7 +74,7 @@ class Terminal
                             COUT << word << " ";
                             word.clear();
                         } else {
-                            COUT << "test";
+                            COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
                             word.clear();
                         }
                         COUT << ENDL;
