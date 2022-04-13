@@ -18,6 +18,7 @@
 #include<unistd.h>
 #include<termios.h>
 #include "defines.h"
+#include "colors.h"
 
 void print_terminal(VECTOR<STRING>& lines);
 void printLine( STRING& line );
@@ -41,17 +42,51 @@ class Terminal
 		
 		void printLine( STRING& line )
 		{
+
+                        Colors colors;
+                        
+                        STRING word;
+
+                        COUT << "\033[2K";
+                        for ( char &i : line ) {
+                            // check for ' '
+
+                            
+                            if ( i == ' ' ) {
+                                if ( colors.find( word ) == "" ) {
+                                    COUT << word << " ";
+                                    word.clear();
+                                    continue;
+                                } else {
+                                    COUT << "test";
+                                    word.clear();
+                                }
+                                COUT << i;
+                            } else {
+                                word.push_back(i);
+                            }
+                            
+                           // COUT << i;       
+                        }
+                        if ( colors.find( word ) == "" ) {
+                            COUT << word << " ";
+                            word.clear();
+                        } else {
+                            COUT << "test";
+                            word.clear();
+                        }
+                        COUT << ENDL;
 			// this function will format and print a line
 			// change this to add coloring later
-			COUT << ESC << "[2K";
-			COUT << line << ENDL;
+			// COUT << "\033[2K";
+			// COUT << line << ENDL;
 		}
 
 		void printLine( void )
 		{
 			// this function will print a dash
 			// change this alongside the other things later
-			COUT << ESC << "[2K";
+			COUT << "\033" << "[2K";
 			COUT << "-" << ENDL;
 		}
 
