@@ -12,6 +12,7 @@
 #include<fstream>
 #include<string>
 #include<vector>
+#include<cctype>
 
 // C libraries to include
 #include<sys/ioctl.h>
@@ -44,40 +45,87 @@ class Terminal
 		void printLine( STRING& line )
 		{
 
-                        Colors colors;
-                        
-                        STRING word;
+			Colors colors;
+			
+			STRING word;
+			bool comment = false;
 
-                        COUT << "\033[2K";
-                        for ( char &i : line ) {
-                            // check for ' '
+			COUT << "\033[2K";
+			
+			VECTOR< STRING > words;
+			bool space = true;
+			if ( !line.empty() )
+				if ( line.at(0) != ' ' )
+					space = false;
 
-                            
-                            if ( i == ' ' ) {
-                                if ( colors.find( word ) == "" ) {
-                                    COUT << word << " ";
-                                    word.clear();
-                                    continue;
-                                } else {
-                                    //COUT << "test";
-				    COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
-                                    word.clear();
-                                }
-                                COUT << i;
-                            } else {
-                                word.push_back(i);
-                            }
-                            
-                           // COUT << i;       
-                        }
-                        if ( colors.find( word ) == "" ) {
-                            COUT << word << " ";
-                            word.clear();
-                        } else {
-                            COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
-                            word.clear();
-                        }
-                        COUT << ENDL;
+			// add each word and spaces to vector 
+			for ( char &i : line ) {
+				if ( space && (isalnum(i) || i == '/') ) {
+					space = false;
+					if ( !word.empty() )
+						words.push_back( word );
+					word.clear();
+					word.push_back( i );
+					continue;
+				}
+				if ( !space && !isalnum(i) && i != '/' ) {
+					space = true;
+					if ( !word.empty() )
+						words.push_back( word );
+					word.clear();
+					word.push_back( i );
+					continue;
+				}
+				word.push_back( i );
+			}
+			if ( !word.empty() )
+				words.push_back( word );
+
+			for ( STRING &wrd : words ) {
+				if ( wrd == "//" ) {
+					COUT << CSI << "38;2;205;0;0m"; // RED
+					comment = true;
+				}
+				if ( colors.find( wrd ) == "" || comment )
+					COUT << wrd;
+				else
+					COUT << CSI << colors.find( wrd ) << wrd << COLORS_NORMAL;
+			}
+
+			COUT << COLORS_NORMAL;
+			COUT << ENDL;
+
+			return;
+			/*
+			for ( char &i : line ) {
+					// check for ' '
+					
+					if ( i == ' ' ) {
+							if ( colors.find( word ) == "" ) {
+									COUT << word << " ";
+									word.clear();
+									continue;
+							} else {
+									//COUT << "test";
+									COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
+									word.clear();
+							}
+							COUT << i;
+					} else {
+							word.push_back(i);
+					}
+					
+				 // COUT << i;       
+			}
+			if ( colors.find( word ) == "" ) {
+					COUT << word << " ";
+					word.clear();
+			} else {
+					COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
+					word.clear();
+			}
+			COUT << ENDL;
+			*/
 			// this function will format and print a line
 			// change this to add coloring later
 			// COUT << "\033[2K";

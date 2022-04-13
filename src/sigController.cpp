@@ -15,6 +15,8 @@ void sig_handler(int signum)
 	// assign ctrl+z and ctrl+c and other things
 	switch(signum) {
 		case SIGSEGV:
+			COUT << CLEAR_SCREEN;
+			COUT << CURS_TO_TOP;
 			COUT << "Segmentation fault (core dumped)" << ENDL;
 		//case SIGINT:
 			//COUT << "SIGINT" << ENDL;
