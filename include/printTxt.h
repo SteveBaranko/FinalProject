@@ -163,7 +163,6 @@ class Terminal
 			open = false;
 		}
 
-
 		void cursRight( ) {
 			if (cursorX < (unsigned int) col)
 				cursorX++;
