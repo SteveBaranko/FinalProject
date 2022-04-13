@@ -6,7 +6,7 @@
  * This file contains the functions to printText ... colorfully
  ***************************************/
 
-#include "colorPrint.h"
+#include "../include/colorPrint.h"
 
 void restoreDefault(){
 	COUT << COLORS_NORMAL;

@@ -19,6 +19,7 @@
 #include<termios.h>
 #include "defines.h"
 #include "colors.h"
+#include "../include/colorPrint.h"
 
 void print_terminal(VECTOR<STRING>& lines);
 void printLine( STRING& line );
@@ -58,7 +59,10 @@ class Terminal
                                     word.clear();
                                     continue;
                                 } else {
-                                    COUT << "test";
+                                    //COUT << "test";
+																		COUT << CSI << "38;2;0;205;205m";
+                                    COUT << word << " ";
+																		COUT << COLORS_NORMAL;
                                     word.clear();
                                 }
                                 COUT << i;
