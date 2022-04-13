@@ -76,13 +76,24 @@ void fileStatus( unsigned int row )
 	COUT << "\033[" << row << ";0H";	
 	COUT << CLEAR_FORMAT;
 }
-
 void fileStatus( STRING status, unsigned int row )
 {
 	// useless right now
-	COUT << "\033[" << row << ";0H";	
+	COUT << CSI << row << ";0H";	
 	COUT << status;
 	COUT << CLEAR_FORMAT;
 	//COUT << "\033[m";
+}
+void cursPos( unsigned int x, unsigned int y )
+{
+	COUT << CSI << y << ";" << x << "H";
+}
+void scrollUp( unsigned int lines )
+{
+	COUT << CSI << lines << "S";
+}
+void scrollDown( unsigned int lines )
+{
+	COUT << CSI << lines << "T";
 }
 

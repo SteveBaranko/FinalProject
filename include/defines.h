@@ -20,6 +20,11 @@
 #define CURS_TO_TOP "\033[0;0H"
 #define PNT_BAR_TO_END "\033[042m"
 #define CLEAR_FORMAT "\033[m"
-#define ESC "\033"
+#define CSI "\033["
+#define CURS_HIDE "\033[?25l"
+#define CURS_SHOW "\033[?25h"
+#define CURS_LOCATE "\033[6n"
+#define COLORS_NORMAL "\033[m"
+
 
 #endif
