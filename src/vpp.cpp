@@ -6,6 +6,7 @@
 *************************/
 
 #include "../include/vppFunc.h"
+#include "../include/colors.h"
 
 int main(int argc, char* argv[]){
 
@@ -20,7 +21,7 @@ int main(int argc, char* argv[]){
 		return -1;
 	}
 
-	// eventually print error for not opening file
+	// print error for not opening file
 	switch( check_permissions( argv[1] ) ) {
             case(-1):
 		COUT << "ERROR: File <"<< argv[1] << "> does not exist" << ENDL;
@@ -62,5 +63,8 @@ int main(int argc, char* argv[]){
 	COUT << "\033[0;0H";	// move cursor to top of terminal
 
 
+        Colors colors;
+        STRING no = "no";
+        if ( colors.find(no) != "" ) COUT << colors.find(no) <<ENDL;
 	return 0;
 }
