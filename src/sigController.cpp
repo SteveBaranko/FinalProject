@@ -18,6 +18,8 @@ void sig_handler(int signum)
 			COUT << "Segmentation fault (core dumped)" << ENDL;
 		//case SIGINT:
 			//COUT << "SIGINT" << ENDL;
+		case SIGCONT:
+			break;
 		default:
 			exit(EXIT_SUCCESS);
 			break;
