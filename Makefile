@@ -45,7 +45,7 @@ $(OBJ)/vppFunc.o: $(SRC)/vppFunc.cpp
 $(OBJ)/vpp.o: $(SRC)/vpp.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/vpp.cpp -o $@
 
-vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o $(OBJ)/printTxt.o $(OBJ)/sigController.o
+vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o $(OBJ)/printTxt.o 
 
 vpp: $(vppObjs) 
 	$(CC) $(CXXFLAGS) -o $(EXE)/vpp $(vppObjs) 
