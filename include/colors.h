@@ -36,8 +36,11 @@ class Colors
 						colors["char"] = 		"38;2;0;205;205m"; // blue
 						colors["float"] =		"38;2;0;205;205m"; // blue
 						colors["struct"] =	"38;2;0;205;205m"; // blue
+						colors["class"] =		"38;2;0;205;205m"; // blue
+						colors["public"] =	"38;2;0;205;205m"; // blue
+						colors["private"] =	"38;2;0;205;205m"; // blue
 						colors["return"] =	"38;2;0;205;205m"; // blue
-						colors["include"]= "38;2;205;0;205m"; // magenta
+						colors["#include"]= "38;2;205;0;205m"; // magenta
         }
         ~Colors() { }
 

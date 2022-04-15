@@ -1,0 +1,17 @@
+four
+fivee
+
+one tab
+	tab
+
+two tabs
+		tab
+
+c then tab
+c	c	c	c
+
+one tab and a period
+	.
+
+four chars then tab
+cccc	.
