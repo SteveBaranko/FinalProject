@@ -248,6 +248,9 @@ class Terminal
 			open = false;
 		}
 
+		void updateFilename( STRING fileIn ) {
+			fileName = fileIn;
+		}
 
 		void cursRight( ) {
 			if (cursorX < (unsigned int) col)

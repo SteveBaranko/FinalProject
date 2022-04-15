@@ -27,7 +27,10 @@ void enableRawMode(void){
 	atexit(disableRawMode);
 
 	struct termios raw=orig_termios;
-	raw.c_lflag &=~(ECHO|ICANON);
+	raw.c_iflag &= ~(BRKINT|ICRNL|INPCK|ISTRIP|IXON);
+	raw.c_oflag &= ~(OPOST);
+	raw.c_cflag |= (CS8);
+	raw.c_lflag &= ~(ECHO|ICANON|IEXTEN|ISIG);
 
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
 }
@@ -36,7 +39,9 @@ void getInput( Terminal& Main )
 {
 	char c;
 	CIN.get(c);
-	if (c == 'q') Main.close();
+	if (c == CTRL('q')) Main.close();
+	//if (c == 'p') Main.close();
+	//if (c == '\x1b') { Main.close(); return; }
 	if (c == '\x1b') {
 		CIN.get(c);
 		if (c == '[') {

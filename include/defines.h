@@ -10,7 +10,8 @@
 
 #define COUT std::cout
 #define CIN std::cin
-#define ENDL std::endl
+//#define ENDL std::endl
+#define ENDL "\r\n"
 #define STRING std::string
 #define VECTOR std::vector
 #define IFSTREAM std::ifstream
