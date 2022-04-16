@@ -263,6 +263,22 @@ class Terminal
 			//return (unsigned int) line.size();	
 		}
 		
+		unsigned int cursStrPos( void )
+		{
+			unsigned int sz = 0;
+			for (unsigned int i = 0; i < (unsigned int) lines.at(cursorY-1+offset).size(); i++) {
+				if ( lines.at(cursorY-1+offset).at(i) == '\t') {
+					sz += (unsigned int) tabLen - (sz % tabLen);
+				} else {
+					sz++;
+				}
+				if (sz == cursorX)
+					return i;
+				if (sz > cursorX)
+					return (unsigned int) i - 1;
+			}
+			return (unsigned int) lines.at(cursorY-1+offset).size()-1;
+		}
 
 	public:
 		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
@@ -392,6 +408,24 @@ class Terminal
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
 				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
+		}
+
+		void deleteChar( ) {
+			if ( !lines.at(cursorY-1+offset).empty() ) {
+				if (cursorX > 1) {
+					lines.at(cursorY-1+offset).erase( cursStrPos()-1, 1 );
+					cursorX--;
+				} else if (cursorY > 2) {
+					lines.at(cursorY-2+offset).append( lines.at(cursorY-1+offset) );
+					lines.erase( lines.begin() + cursorY-1+offset );
+					cursorY--;
+					cursorX = (unsigned int) lines.at(cursorY-2+offset).size();
+				}
+			} else {
+				lines.erase( lines.begin() + cursorY-1+offset );
+				cursorY--;
+				cursorX = (unsigned int) lines.at(cursorY-2+offset).size();
+			}
 		}
 
 };

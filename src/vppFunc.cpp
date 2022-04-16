@@ -39,6 +39,7 @@ void getInput( Terminal& Main )
 {
 	char c;
 	CIN.get(c);
+	if (c == 'd') Main.deleteChar();
 	if (c == CTRL('q')) Main.close();
 	//if (c == 'p') Main.close();
 	//if (c == '\x1b') { Main.close(); return; }
