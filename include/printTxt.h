@@ -50,40 +50,34 @@ class Terminal
 			Colors colors;
 			
 			STRING word;
+			bool comment = false;
 
-			/*
-			// Testing Cursor movement and lineSize()
 			COUT << "\033[2K";
 			COUT << line << " (lineSize: " << lineSize(line) << ")" << ENDL;
 			return;
-			*/
 			
-
 			VECTOR< STRING > words;
-			unsigned int prevGrp;
-			unsigned int currGrp;
-			if ( line.empty() ) {
-				COUT << "\033[2K";
-				COUT << line;
-				COUT << COLORS_NORMAL;
-				COUT << ENDL;
-				return;
-			}
-			bool first = true;
-			prevGrp = charGroup( line.at(0) );
-			word.push_back( line.at(0) );
+			bool space = true;
+			if ( !line.empty() )
+				if ( line.at(0) != ' ' )
+					space = false;
 
 			// add each word and spaces to vector 
 			for ( char &i : line ) {
-				if (first) { first = false; continue; }
-
-				currGrp = charGroup( i );
-				if ( prevGrp != currGrp ) {
+				if ( space && (isalnum(i) || i == '/') ) {
+					space = false;
 					if ( !word.empty() )
 						words.push_back( word );
 					word.clear();
 					word.push_back( i );
-					prevGrp = currGrp;
+					continue;
+				}
+				if ( !space && !isalnum(i) && i != '/' ) {
+					space = true;
+					if ( !word.empty() )
+						words.push_back( word );
+					word.clear();
+					word.push_back( i );
 					continue;
 				}
 				word.push_back( i );
@@ -91,44 +85,15 @@ class Terminal
 			if ( !word.empty() )
 				words.push_back( word );
 
-			// print each word to terminal
-			unsigned int printSz = 0;
-			bool comment = false;
-			bool quotes = false;
-			COUT << "\033[2K";
 			for ( STRING &wrd : words ) {
-				if ( wrd == "//" && !quotes ) {
+				if ( wrd == "//" ) {
 					COUT << CSI << "38;2;205;0;0m"; // RED
 					comment = true;
 				}
-				if ( wrd == "\"" && !comment ) {
-					quotes = !quotes;
-					// now in a " "
-					if ( quotes ) {
-						COUT << CSI << "38;2;0;180;0m";
-					} else {
-						COUT << wrd;
-						COUT << COLORS_NORMAL;
-						continue;
-					}
-				}
-				if (wrd.at(0) == '\t') {
-					for (unsigned int i = 0; i < (unsigned int) wrd.size(); i++) {
-						for (unsigned int j = 0; j < (unsigned int) tabLen - (printSz % tabLen); j++) {
-							COUT << " ";
-						}
-						printSz += tabLen - (printSz % tabLen);
-					}
-					//COUT << CSI << "38;2;100;0;100m";
-					continue;
-				}
-				if ( colors.find( wrd ) == "" || comment || quotes )
+				if ( colors.find( wrd ) == "" || comment )
 					COUT << wrd;
 				else
 					COUT << CSI << colors.find( wrd ) << wrd << COLORS_NORMAL;
-				if (wrd == "#include")
-						COUT << CSI << "38;2;0;180;0m";
-				printSz += (unsigned int) wrd.size();
 			}
 
 			COUT << COLORS_NORMAL;
@@ -169,45 +134,6 @@ class Terminal
 			// change this to add coloring later
 			// COUT << "\033[2K";
 			// COUT << line << ENDL;
-		}
-
-
-		unsigned int charGroup( char& c )
-		{
-			switch (c) {
-				case ' ':
-					return 0;
-				case '\t':
-					return 1;
-				case '/':
-					return 2;
-				case '*':
-					return 2;
-				case '(':
-					return 3;
-				case ')':
-					return 3;
-				case '[':
-					return 3;
-				case ']':
-					return 3;
-				case '{':
-					return 3;
-				case '}':
-					return 3;
-				case '<':
-					return 3;
-				case '>':
-					return 3;
-				case ':':
-					return 3;
-				case ';':
-					return 3;
-				case '"':
-					return 4;
-				default:
-					return 5;
-			}
 		}
 
 		void printLine( void )
@@ -262,12 +188,28 @@ class Terminal
 			return sz;
 			//return (unsigned int) line.size();	
 		}
-		
+
+		unsigned int cursStrPos( void )
+		{
+			unsigned int sz = 0;
+			for (unsigned int i = 0; i < (unsigned int) lines.at(cursorY-1+offset).size(); i++) {
+				if ( lines.at(cursorY-1+offset).at(i) == '\t' ) {
+					sz += (unsigned int) tabLen - (sz % tabLen);
+				}	else {
+					sz++;
+				}
+				if (sz == cursorX)
+					return i;
+				if (sz > cursorX)
+					return (unsigned int) i-1;
+			}
+			return 0;
+		}
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 8 ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 8 ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 8 ) { }
 		~Terminal( ) { }
 
 		
@@ -392,6 +334,14 @@ class Terminal
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
 				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
+		}
+
+		void deleteChar( ) {
+			if ( !lines.at(cursorY-1+offset).empty() ) {
+				lines.at(cursorY-1+offset).erase( cursStrPos(), 1 );
+				if (cursorX > 1)
+					cursorX--;
+			}
 		}
 
 };
