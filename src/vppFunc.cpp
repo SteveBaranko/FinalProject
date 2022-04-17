@@ -39,8 +39,12 @@ void getInput( Terminal& Main )
 {
 	char c;
 	CIN.get(c);
-	if (c == 'd') Main.deleteChar();
-	if (c == CTRL('q')) Main.close();
+	if (c == (char) 127) { Main.backspaceChar(); return; }
+	if (c == '~') { Main.deleteChar(); return; }
+	if (c == (char) 13) { Main.addLine(); return; }
+	//if (c) Main.insertChar(c);
+	if (c == CTRL('q')) { Main.close(); return; }
+	if (c == CTRL('s')) { Main.save(); return; }
 	//if (c == 'p') Main.close();
 	//if (c == '\x1b') { Main.close(); return; }
 	if (c == '\x1b') {
@@ -64,7 +68,9 @@ void getInput( Terminal& Main )
 					break;
 			}
 		}
+		return;
 	}
+	Main.insertChar( c );
 }
 
 
