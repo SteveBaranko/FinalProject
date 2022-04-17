@@ -82,7 +82,7 @@ struct dllist{
 		}
 		void inc() {
 			if( empty() ) return;
-			if( this->curr_node == tail_node ){
+			if( this->curr_node == this->tail_node ){
 				return;
 			}
 				this->curr_node = this->curr_node->next_node;
@@ -99,7 +99,7 @@ struct dllist{
 
 		void push_curr( const T& insert_val ){
 
-			dllist<T> insert_node = new dllist_node<T> ( insert_val );
+			dllist_node<T>* insert_node = new dllist_node<T> ( insert_val );
 
 			if( this->empty() ){
 				this->head_node = insert_node;
@@ -118,7 +118,9 @@ struct dllist{
 
 			this->curr_node->prev_node->next_node = this->curr_node;
 			
-			destructor( curr_node->next_node);
+			destructor( this->curr_node->next_node);
+			this->curr_node->next_node = NULL;
+			this->tail_node = this->curr_node;
 			return;
 			
 			
