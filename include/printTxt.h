@@ -368,7 +368,7 @@ class Terminal
 				cursorX++;
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) )
-				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset));
+				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1;
 			// Using STRING.size() method instead of lineSize()
 			//if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
 				//cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
@@ -410,7 +410,7 @@ class Terminal
 				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 		}
 
-		void deleteChar( ) {
+		void backspaceChar( ) {
 			if ( !lines.at(cursorY-1+offset).empty() ) {
 				if (cursorX > 1) {
 					lines.at(cursorY-1+offset).erase( cursStrPos()-1, 1 );
@@ -421,11 +421,47 @@ class Terminal
 					cursorY--;
 					cursorX = (unsigned int) lines.at(cursorY-2+offset).size();
 				}
-			} else {
+			} else if (cursorY > 2) {
 				lines.erase( lines.begin() + cursorY-1+offset );
 				cursorY--;
 				cursorX = (unsigned int) lines.at(cursorY-2+offset).size();
 			}
+		}
+
+		void deleteChar( ) {
+			if ( lines.at(cursorY-1+offset).empty() )
+				return;
+			lines.at(cursorY-1+offset).erase( cursStrPos(), 1 );
+		}
+
+		void insertChar( char c ) {
+			if ( !lines.at(cursorY-1+offset).empty() ) {
+				if ( cursorX > (unsigned int) lines.at(cursorY-1+offset).size()+1)
+					lines.at(cursorY-1+offset) += c;
+				else
+					lines.at(cursorY-1+offset).insert( lines.at(cursorY-1+offset).begin() + cursorX - 1, c );
+				cursorX++;
+			} else {
+				lines.at(cursorY-1+offset).append(1,c);
+				cursorX++;
+			}
+		}
+
+		void addLine( ) {
+			lines.insert( lines.begin() + cursorY, "" );
+			cursorY++;
+		}
+
+		void save( void ) {
+			if ( fileName.empty() )
+				return;
+
+			OFSTREAM outFile( fileName );
+			
+			for (unsigned int i = 0; i < lines.size(); i++) {
+				outFile << lines.at(i) << "\n";
+			}
+			outFile.close();
 		}
 
 };
