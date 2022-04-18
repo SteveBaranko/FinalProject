@@ -16,6 +16,7 @@
 #define VECTOR std::vector
 #define IFSTREAM std::ifstream
 #define OFSTREAM std::ofstream
+#define STRSTREAM std::stringstream
 
 #define CLEAR_SCREEN "\033[2J"
 #define CURS_TO_TOP "\033[0;0H"
