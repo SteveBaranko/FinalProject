@@ -11,6 +11,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<sstream>
 #include<vector>
 #include<cctype>
 
@@ -135,36 +136,6 @@ class Terminal
 			COUT << ENDL;
 
 			return;
-			/*
-			for ( char &i : line ) {
-					// check for ' '
-					
-					if ( i == ' ' ) {
-							if ( colors.find( word ) == "" ) {
-									COUT << word << " ";
-									word.clear();
-									continue;
-							} else {
-									//COUT << "test";
-									COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
-									word.clear();
-							}
-							COUT << i;
-					} else {
-							word.push_back(i);
-					}
-					
-				 // COUT << i;       
-			}
-			if ( colors.find( word ) == "" ) {
-					COUT << word << " ";
-					word.clear();
-			} else {
-					COUT << CSI << colors.find( word ) << word << COLORS_NORMAL;
-					word.clear();
-			}
-			COUT << ENDL;
-			*/
 			// this function will format and print a line
 			// change this to add coloring later
 			// COUT << "\033[2K";
@@ -223,8 +194,11 @@ class Terminal
 			// print a highlighted bar at the end of the text editor
 			//COUT << "\033[42m";
 			COUT << PNT_BAR_TO_END;
-			// print spaces for the entire row
-			for (unsigned int i = 0; i < rowSz; i++)
+			// print fileName
+			COUT << CSI << "38;2;10;10;10m";
+			COUT << fileName;
+			// print spaces for the rest row
+			for (unsigned int i = (unsigned int) fileName.size(); i < rowSz; i++)
 				COUT << " ";
 			//COUT << "\033[m";
 			COUT << CLEAR_FORMAT;
@@ -235,6 +209,7 @@ class Terminal
 		{
 			// useless right now
 			COUT << "\033[" << rowEnd << ";0H";	
+			COUT << "\033[2K";
 			COUT << "\033[m";
 		}
 
@@ -242,6 +217,7 @@ class Terminal
 		{
 			// useless right now
 			COUT << "\033[" << rowEnd << ";0H";	
+			COUT << "\033[2K";
 			COUT << status;
 			COUT << CLEAR_FORMAT;
 			//COUT << "\033[m";
@@ -249,8 +225,11 @@ class Terminal
 
 		unsigned int lineSize( STRING line )
 		{
+			// this function will give the size of the lines in
+			// cursor units because not all characters have equal size
+			// e.g. \t is longer than a \s
 			if (line.size() == 0)
-				return 1;
+				return 0;
 			unsigned int sz = 0;
 			for (unsigned int i = 0; i < (unsigned int) line.size(); i++) {
 				if ( line.at(i) == '\t' ) {
@@ -275,9 +254,30 @@ class Terminal
 				if (sz == cursorX)
 					return i;
 				if (sz > cursorX)
-					return (unsigned int) i - 1;
+					return (unsigned int) i;
 			}
 			return (unsigned int) lines.at(cursorY-1+offset).size()-1;
+		}
+
+		unsigned int cursLinePos( unsigned int ind )
+		{
+			// return the cursor position on screen given the char
+			// of the cursor in the string
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			//unsigned int cursCol = (unsigned int) cursorX-1;
+			unsigned int sz = 0;
+
+			if ( ind > (unsigned int) lines.at(cursRow).size() )
+				return lineSize( lines.at(cursRow) );
+
+			for (unsigned int i = 0; i < ind; i++) {
+				if ( lines.at(cursRow).at(i) == '\t') {
+					sz += (unsigned int) tabLen - (sz % tabLen);
+				} else {
+					sz++;
+				}
+			}
+			return sz;		
 		}
 
 	public:
@@ -305,12 +305,12 @@ class Terminal
 
 			highlightBar( col );
 
-			fileStatus( fileName, row );
+			//fileStatus( fileName, row );
 
 			//COUT << "\033[0;0H";	// move cursor to top of terminal
 			//COUT << CURS_TO_TOP;
-			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) )
-				COUT << "\033[" << cursorY << ";" << lineSize(lines.at(cursorY-1+offset)) << "H";
+			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1)
+				COUT << "\033[" << cursorY << ";" << lineSize(lines.at(cursorY-1+offset))+1 << "H";
 			else
 				COUT << "\033[" << cursorY << ";" << cursorX << "H";
 
@@ -355,6 +355,17 @@ class Terminal
 			return open;
 		}
 
+		bool isDirty( ) {
+			return dirty;
+		}
+
+		void addWarning( STRING warning )
+		{
+			// add warning to bottom of text editor
+			fileStatus( warning, row);
+			//fileStatus( fileName, row );
+		}
+
 		void close( ) {
 			open = false;
 		}
@@ -364,25 +375,62 @@ class Terminal
 		}
 
 		void cursRight( ) {
+			// get current position in string, then move
+			// the cursor to the next char in string
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 			if (cursorX < (unsigned int) col)
 				cursorX++;
+			
+			
+			if ( !lines.at( cursRow ).empty() )
+				if ( lines.at( cursRow ).at( cursStrPos() ) == '\t' )
+					cursorX += (unsigned int) 1 + tabLen - (cursorX % tabLen);
+					
+
 			// limit cursor to right by line size
-			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) )
-				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1;
+			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1)
+				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 2;
 			// Using STRING.size() method instead of lineSize()
 			//if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
 				//cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
+			return;
+			/*
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			STRSTREAM ss;
+			if ( !lines.at( cursRow ).empty() ) {
+				ss << lines.at( cursRow ).at( cursStrPos() );
+				ss << " ( " << cursStrPos() << " )";
+				fileStatus( ss.str(), row );
+			}
+			*/
 		}
 
 		void cursLeft( ) {
 			// if the cursor is beyond line, bring it back
-			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) )
-				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset));
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1)
+				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1;
+			
+				
 			// Using STRING.size() method instead of lineSize()
 			//if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
 				//cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 			if (cursorX > 1)
 				cursorX--;
+			if ( !lines.at( cursRow ).empty() )
+				if ( lines.at( cursRow ).at( cursStrPos() ) == '\t' && cursorX > 1)
+					cursorX -= (unsigned int) tabLen - (cursorX % tabLen) - 1;
+
+			return;
+			/*
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			STRSTREAM ss;
+			if ( !lines.at( cursRow ).empty() ) {
+				ss << lines.at( cursRow ).at( cursStrPos() );
+				ss << " ( " << cursStrPos() << " )";
+				fileStatus( ss.str(), row );
+			}
+			*/
 		}
 
 		void cursDown( ) {
@@ -393,6 +441,9 @@ class Terminal
 			// limit cursor to only lines of the file
 			if (cursorY > (unsigned int) lines.size() - offset)
 				cursorY = (unsigned int) lines.size() - offset;
+			// keep the cursor off space between tabs
+			cursRight();
+			cursLeft();
 			return;
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
@@ -404,6 +455,9 @@ class Terminal
 				cursorY--;
 			else
 				if ( offset > 0 ) offset--;
+			// keep the cursor off space between tabs
+			cursRight();
+			cursLeft();
 			return;
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
@@ -411,30 +465,55 @@ class Terminal
 		}
 
 		void backspaceChar( ) {
-			if ( !lines.at(cursorY-1+offset).empty() ) {
-				if (cursorX > 1) {
-					lines.at(cursorY-1+offset).erase( cursStrPos()-1, 1 );
-					cursorX--;
-				} else if (cursorY > 2) {
-					lines.at(cursorY-2+offset).append( lines.at(cursorY-1+offset) );
-					lines.erase( lines.begin() + cursorY-1+offset );
-					cursorY--;
-					cursorX = (unsigned int) lines.at(cursorY-2+offset).size();
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			unsigned int cursCol = (unsigned int) cursorX-1;
+			// debugging, printing cursor location
+			STRSTREAM ss;
+			ss << "(" << cursCol << ", " << cursRow << ")";
+			//fileStatus( ss.str(), row );
+			dirty = true;
+
+			if ( lines.at(cursRow).empty() ) {
+				// if the line is empty, delete the row
+				// only delete row if it is not the first
+				if ( cursRow > 0 ) {
+					lines.erase( lines.begin() + cursRow );
+					cursUp();
+					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1)) + 1;
 				}
-			} else if (cursorY > 2) {
-				lines.erase( lines.begin() + cursorY-1+offset );
-				cursorY--;
-				cursorX = (unsigned int) lines.at(cursorY-2+offset).size();
-			}
+				return;
+			} 
+
+			if ( cursCol == 0 ) {
+				// cursor at start of line, append row below and delete the row
+				// only delete row if it is not the first
+				if ( cursRow > 0 ) {
+					cursUp();
+					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1)) + 1;
+					if ( lines.at(cursRow - 1).empty() )
+						cursorX = 1;
+					lines.at(cursRow - 1).append( lines.at(cursRow) );
+					lines.erase( lines.begin() + cursRow );
+				}
+				return;
+			} 
+
+			// otherwise, move cursor to left and delete char
+			cursLeft();
+			lines.at(cursRow).erase( cursStrPos(), 1 );
+			
+			return;
 		}
 
 		void deleteChar( ) {
+			dirty = true;
 			if ( lines.at(cursorY-1+offset).empty() )
 				return;
 			lines.at(cursorY-1+offset).erase( cursStrPos(), 1 );
 		}
 
 		void insertChar( char c ) {
+			dirty = true;
 			if ( !lines.at(cursorY-1+offset).empty() ) {
 				if ( cursorX > (unsigned int) lines.at(cursorY-1+offset).size()+1)
 					lines.at(cursorY-1+offset) += c;
@@ -448,13 +527,20 @@ class Terminal
 		}
 
 		void addLine( ) {
+			dirty = true;
+			// add an extra vector to lines
 			lines.insert( lines.begin() + cursorY, "" );
-			cursorY++;
+			// move 
+			//cursorY++;
+			cursDown();
 		}
 
 		void save( void ) {
+			// fix this later
 			if ( fileName.empty() )
 				return;
+
+			dirty = false;
 
 			OFSTREAM outFile( fileName );
 			

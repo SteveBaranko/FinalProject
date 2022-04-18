@@ -43,7 +43,17 @@ void getInput( Terminal& Main )
 	if (c == '~') { Main.deleteChar(); return; }
 	if (c == (char) 13) { Main.addLine(); return; }
 	//if (c) Main.insertChar(c);
-	if (c == CTRL('q')) { Main.close(); return; }
+	if (c == CTRL('q')) { 
+		if ( Main.isDirty() ) {
+			Main.addWarning( "Unsaved Changes: Press Ctrl+Q again to quit without saving" );
+			CIN.get(c);
+			Main.addWarning( " " );
+			if ( c != CTRL('q') )
+				return;
+		}
+		Main.close(); 
+		return; 
+	}
 	if (c == CTRL('s')) { Main.save(); return; }
 	//if (c == 'p') Main.close();
 	//if (c == '\x1b') { Main.close(); return; }

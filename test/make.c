@@ -2,6 +2,10 @@
 
 #include <stdio.h>
 
+// this is a test to see if 
+// we can add new lines
+// the answer is yes we can
+
 int main()
 {
 	int i;
@@ -11,6 +15,8 @@ int main()
 	return 0;
 }
 
+
+// i love you
 
 //this is a test
 
