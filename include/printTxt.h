@@ -45,7 +45,10 @@ class Terminal
 		bool dirty;
 		unsigned int tabLen;
 		
-		void printLine( STRING& line )
+		// rn we are changing the line 
+		// so pass by value, not reference
+		//void printLine( STRING& line )
+		void printLine( STRING line )
 		{
 
 			Colors colors;
@@ -75,6 +78,12 @@ class Terminal
 			bool first = true;
 			prevGrp = charGroup( line.at(0) );
 			word.push_back( line.at(0) );
+
+			// change this later, for now limit line to the size of the
+			// screen so it doesn't overflow
+			while ( col < lineSize( line ) ) {
+				line = line.substr( 0 , line.size() - 1);
+			}
 
 			// add each word and spaces to vector 
 			for ( char &i : line ) {
@@ -274,6 +283,8 @@ class Terminal
 		
 		unsigned int cursStrPos( void )
 		{
+			// return the position of the cursor in the string
+			// with its current position in the screen
 			unsigned int sz = 0;
 			for (unsigned int i = 0; i < (unsigned int) lines.at(cursorY-1+offset).size(); i++) {
 				if ( lines.at(cursorY-1+offset).at(i) == '\t') {
@@ -324,6 +335,7 @@ class Terminal
 
 		void updateTerminal() {
 			//COUT << CLEAR_SCREEN;		// clear the screen
+			COUT << CURS_HIDE;
 			COUT << CURS_TO_TOP;	// move cursor to top of terminal
 			for (unsigned int i = 0; i < (unsigned int) row-2; i++) {
 				if ( i < (unsigned int) lines.size() - offset ) {
@@ -339,6 +351,7 @@ class Terminal
 
 			//COUT << "\033[0;0H";	// move cursor to top of terminal
 			//COUT << CURS_TO_TOP;
+			COUT << CURS_SHOW;
 			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1)
 				COUT << "\033[" << cursorY << ";" << lineSize(lines.at(cursorY-1+offset))+1 << "H";
 			else
