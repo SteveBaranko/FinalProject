@@ -16,12 +16,3 @@ int main()
 }
 
 
-// i love you
-
-//this is a test
-
-//ak
-
-
-
-

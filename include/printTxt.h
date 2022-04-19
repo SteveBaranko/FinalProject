@@ -480,7 +480,9 @@ class Terminal
 				if ( cursRow > 0 ) {
 					lines.erase( lines.begin() + cursRow );
 					cursUp();
-					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1)) + 1;
+					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1));
+					cursRight();
+					cursRight();
 				}
 				return;
 			} 
@@ -490,11 +492,13 @@ class Terminal
 				// only delete row if it is not the first
 				if ( cursRow > 0 ) {
 					cursUp();
-					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1)) + 1;
-					if ( lines.at(cursRow - 1).empty() )
+					cursRow = (unsigned int) cursorY-1+offset;
+					cursorX = (unsigned int) lineSize(lines.at(cursRow)) + 1;
+
+					if ( lines.at(cursRow).empty() )
 						cursorX = 1;
-					lines.at(cursRow - 1).append( lines.at(cursRow) );
-					lines.erase( lines.begin() + cursRow );
+					lines.at(cursRow).append( lines.at(cursRow+1) );
+					lines.erase( lines.begin() + cursRow + 1);
 				}
 				return;
 			} 
@@ -531,11 +535,12 @@ class Terminal
 
 		void insertChar( char c ) {
 			dirty = true;
-			if ( !lines.at(cursorY-1+offset).empty() ) {
-				if ( cursorX > (unsigned int) lines.at(cursorY-1+offset).size()+1)
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			if ( !lines.at(cursRow).empty() ) {
+				if ( cursorX > (unsigned int) lineSize( lines.at(cursRow) )+1)
 					lines.at(cursorY-1+offset) += c;
 				else
-					lines.at(cursorY-1+offset).insert( lines.at(cursorY-1+offset).begin() + cursorX - 1, c );
+					lines.at(cursorY-1+offset).insert( lines.at(cursRow).begin() + cursStrPos(), c );
 				//cursorX++;
 				cursRight();
 			} else {
