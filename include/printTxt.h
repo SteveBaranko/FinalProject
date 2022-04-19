@@ -60,9 +60,11 @@ class Terminal
 			*/
 			
 
+			// split each character in the line into a vector of words
 			VECTOR< STRING > words;
 			unsigned int prevGrp;
 			unsigned int currGrp;
+			// if the line is empty, print nothing and exit function
 			if ( line.empty() ) {
 				COUT << "\033[2K";
 				COUT << line;
@@ -76,9 +78,12 @@ class Terminal
 
 			// add each word and spaces to vector 
 			for ( char &i : line ) {
+				// this if statement will ignore first character
 				if (first) { first = false; continue; }
 
+				// check what group the char is in
 				currGrp = charGroup( i );
+				// create new word to add to vector if new char group
 				if ( prevGrp != currGrp ) {
 					if ( !word.empty() )
 						words.push_back( word );
@@ -87,53 +92,72 @@ class Terminal
 					prevGrp = currGrp;
 					continue;
 				}
+				// add same group char to word
 				word.push_back( i );
 			}
+
+			// add the last word to words if not empty
 			if ( !word.empty() )
 				words.push_back( word );
 
 			// print each word to terminal
+			// set initialized variables for printing
 			unsigned int printSz = 0;
 			bool comment = false;
 			bool quotes = false;
 			COUT << "\033[2K";
+			// loop through each word in words
 			for ( STRING &wrd : words ) {
+				// if wrd is "//", this line is a comment
 				if ( wrd == "//" && !quotes ) {
+					// set color to red, and comment to true
 					COUT << CSI << "38;2;205;0;0m"; // RED
 					comment = true;
 				}
+				// if a wrd is ' " ', this is a quote
 				if ( wrd == "\"" && !comment ) {
+					// flip bool for quotes
 					quotes = !quotes;
 					// now in a " "
 					if ( quotes ) {
 						COUT << CSI << "38;2;0;180;0m";
 					} else {
+						// outside of a " "
 						COUT << wrd;
 						COUT << COLORS_NORMAL;
 						continue;
 					}
 				}
+				// if a word is a tabbing
 				if (wrd.at(0) == '\t') {
+					// if multiple tabbings exist
 					for (unsigned int i = 0; i < (unsigned int) wrd.size(); i++) {
+						// add spaces for each tabbing
 						for (unsigned int j = 0; j < (unsigned int) tabLen - (printSz % tabLen); j++) {
 							// debugging for now. Tabs are now dashes so it is easier to see them
-							//COUT << " ";
-							COUT << "-";
+							COUT << " ";
+							//COUT << "-";
 						}
+						// keep adding the number of spaces added to print line
 						printSz += tabLen - (printSz % tabLen);
 					}
 					//COUT << CSI << "38;2;100;0;100m";
 					continue;
 				}
+				// if the word is not usually colored, or word is in a quote or a comment, then print
 				if ( colors.find( wrd ) == "" || comment || quotes )
 					COUT << wrd;
+				// print the colored word from the dictionary
 				else
 					COUT << CSI << colors.find( wrd ) << wrd << COLORS_NORMAL;
+				// hard printing #include for now
 				if (wrd == "#include")
 						COUT << CSI << "38;2;0;180;0m";
+				// keep adding the word size to printSz
 				printSz += (unsigned int) wrd.size();
 			}
 
+			// make colors normal and add a new line + carriage line
 			COUT << COLORS_NORMAL;
 			COUT << ENDL;
 
