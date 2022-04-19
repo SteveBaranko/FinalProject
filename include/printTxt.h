@@ -171,6 +171,10 @@ class Terminal
 
 		unsigned int charGroup( char& c )
 		{
+			// this function will determine which group each char is in
+			// spacing would be its own group, tabs is its own group,
+			// comments are its own group, groupings are its own group,
+			// quotes are its own group, and everything else is left alone
 			switch (c) {
 				case ' ':
 					return 0;
