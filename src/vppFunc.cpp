@@ -27,19 +27,37 @@ void enableRawMode(void){
 	atexit(disableRawMode);
 
 	struct termios raw=orig_termios;
-	raw.c_lflag &=~(ECHO|ICANON);
+	raw.c_iflag &= ~(BRKINT|ICRNL|INPCK|ISTRIP|IXON);
+	raw.c_oflag &= ~(OPOST);
+	raw.c_cflag |= (CS8);
+	raw.c_lflag &= ~(ECHO|ICANON|IEXTEN|ISIG);
 
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
 }
 
 void getInput( Terminal& Main )
 {
-	//char c;
-	fprintf(stdin,"\033[?1000h");
-	Main.cursClick();
-	//CIN.get(c);
-	//if (c == 'q') Main.close();
-	/*if (c == '\x1b') {
+	char c;
+	CIN.get(c);
+	if (c == (char) 127) { Main.backspaceChar(); return; }
+	if (c == '~') { Main.deleteChar(); return; }
+	if (c == (char) 13) { Main.addLine(); return; }
+	//if (c) Main.insertChar(c);
+	if (c == CTRL('q')) { 
+		if ( Main.isDirty() ) {
+			Main.addWarning( "Unsaved Changes: Press Ctrl+Q again to quit without saving" );
+			CIN.get(c);
+			Main.addWarning( " " );
+			if ( c != CTRL('q') )
+				return;
+		}
+		Main.close(); 
+		return; 
+	}
+	if (c == CTRL('s')) { Main.save(); return; }
+	//if (c == 'p') Main.close();
+	//if (c == '\x1b') { Main.close(); return; }
+	if (c == '\x1b') {
 		CIN.get(c);
 		if (c == '[') {
 			CIN.get(c);
@@ -66,8 +84,9 @@ void getInput( Terminal& Main )
 					break;
 			}
 		}
-	}*/
-	fprintf(stdin,"\033[?1000l");
+		return;
+	}
+	Main.insertChar( c );
 }
 
 

@@ -10,11 +10,13 @@
 
 #define COUT std::cout
 #define CIN std::cin
-#define ENDL std::endl
+//#define ENDL std::endl
+#define ENDL "\r\n"
 #define STRING std::string
 #define VECTOR std::vector
 #define IFSTREAM std::ifstream
 #define OFSTREAM std::ofstream
+#define STRSTREAM std::stringstream
 
 #define CLEAR_SCREEN "\033[2J"
 #define CURS_TO_TOP "\033[0;0H"
