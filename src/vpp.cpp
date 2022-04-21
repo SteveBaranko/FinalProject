@@ -11,7 +11,7 @@
 int main(int argc, char* argv[]){
 
 	enableRawMode();
-	setHandlers();
+	//setHandlers();
 
 	if (argc < 2) {
 		// FIx this, testing printing to terminal

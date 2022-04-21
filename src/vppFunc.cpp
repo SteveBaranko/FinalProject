@@ -38,6 +38,7 @@ void enableRawMode(void){
 void getInput( Terminal& Main )
 {
 	char c;
+	Main.cursClick();
 	CIN.get(c);
 	if (c == (char) 127) { Main.backspaceChar(); return; }
 	if (c == '~') { Main.deleteChar(); return; }
@@ -78,9 +79,6 @@ void getInput( Terminal& Main )
 					Main.cursClick();
 					break;
 				default:
-					system("clear");
-					fprintf(stdin,"%c\n",c);
-					exit(0);
 					break;
 			}
 		}

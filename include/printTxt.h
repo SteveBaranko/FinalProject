@@ -508,7 +508,7 @@ class Terminal
 
 		void cursClick(){
 			int cnt=0;
-			int x=0,y=0;
+			unsigned int x=0,y=0;
 			unsigned long long mask;
 			void *ppt;
 			void **nums=(void**) malloc(100*sizeof(void*));
@@ -517,7 +517,7 @@ class Terminal
 			void *empty=malloc(2*sizeof(char));
 			struct winsize w;
 			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w);
-			fprintf(stdin,"\033[?1000h");
+			fprintf(stdout,"\033[?1000h");
 			fread((void*)nums[cnt],1,6,stdin);
 			mask=0x80;
 			ppt=(void*)(4+(char*)nums[cnt]);
@@ -529,23 +529,23 @@ class Terminal
 				fread(ppt,1,1,stdin);
 			}
 			mask=0xFF;
-			x=(int) mask & *(int*)ppt;
+			x=(unsigned int) mask & *(unsigned int*)ppt;
 			if(x<128){
 				ppt=(void*)(5+(char*)nums[cnt]);
-				y=(int)mask & *(int*)ppt;
-				y-=33;
-				if(y>(int)lines.size()-1)
-					y=(int)lines.size()-1;
+				y=(unsigned int)mask & *(unsigned int*)ppt;
+				y-=32;
+				if(y>(unsigned int)lines.size()-2)
+					y=(unsigned int)lines.size()-2;
 				cursorY=y;
-				x-=33;
-				if(x>(int)lines.at(cursorY-1+offset).size())
-					x=(int)lines.at(cursorY-1+offset).size();
+				x-=32;
+				if(x>(unsigned int)lines.at(cursorY-1+offset).size())
+					x=(unsigned int)lines.at(cursorY-1+offset).size()+1;
 				cursorX=x;
-				system("clear");
-				fprintf(stdout,"%d %d\n",x,y);
 			}
-			fprintf(stdin,"\033[?1000l");
-			exit(0);
+			//system("clear");
+			//fprintf(stdout,"%d %d\n",cursorX,cursorY);
+			fprintf(stdout,"\033[?1000l");
+			//exit(0);
 			cnt++;
 		}
 		
