@@ -374,6 +374,8 @@ class Terminal
 			while ( inFile.get(c) ) {
 				// check for newline
 				if ( c == '\n' ) {
+					// add space to end of line
+					lineStr += ' ';
 					// add line to vector lines
 					lines.push_back(lineStr);
 					// clear the string lineStr
@@ -421,6 +423,18 @@ class Terminal
 			// get current position in string, then move
 			// the cursor to the next char in string
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			if ( lines.at(cursRow).empty() )
+				return;
+
+			unsigned int ind = cursStrPos();
+
+			// check if at last char in string
+			if ( ind == (unsigned int) lines.at(cursRow).size() - 1 )
+				return;
+
+			cursorX = cursLinePos( (unsigned int) ind + 1 );
+
+			return;
 			if (cursorX < (unsigned int) col)
 				cursorX++;
 			
@@ -465,7 +479,10 @@ class Terminal
 			unsigned int ind = cursStrPos();
 			// if the index is 0, set cursor to left side of screen
 			if (ind == 0) {
-				cursorX = 1;
+				if ( lines.at(cursRow).at(ind) != '\t' )
+					cursorX = 1;
+				else
+					cursorX = tabLen;
 				return;
 			}
 
@@ -523,18 +540,22 @@ class Terminal
 					cursUp();
 					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1));
 					cursRight();
-					cursRight();
 				}
 				return;
 			} 
 
-			if ( cursCol == 0 ) {
+			unsigned int ind = cursStrPos();
+
+			if ( ind == 0 ) {
 				// cursor at start of line, append row below and delete the row
 				// only delete row if it is not the first
 				if ( cursRow > 0 ) {
 					cursUp();
 					cursRow = (unsigned int) cursorY-1+offset;
-					cursorX = (unsigned int) lineSize(lines.at(cursRow)) + 1;
+					cursorX = (unsigned int) lineSize(lines.at(cursRow));
+
+					// delete space at end of line
+					lines.at(cursRow).erase( lines.at(cursRow).end()-1 );
 
 					if ( lines.at(cursRow).empty() )
 						cursorX = 1;
@@ -556,9 +577,10 @@ class Terminal
 			*/
 
 			// otherwise, move cursor to left and delete char
-			cursLeft();
-			lines.at(cursRow).erase( cursStrPos(), 1 );
+			lines.at(cursRow).erase( ind-1, 1 );
+			cursorX = cursLinePos( ind-1 );
 
+			return;
 			// if at end of line, move back to right
 			if ( cursorX > lineSize( lines.at(cursRow) ) )
 				cursRight();
@@ -576,16 +598,25 @@ class Terminal
 
 		void insertChar( char c ) {
 			dirty = true;
+			// get the row of the cursor
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 			if ( !lines.at(cursRow).empty() ) {
-				if ( cursorX > (unsigned int) lineSize( lines.at(cursRow) )+1)
-					lines.at(cursorY-1+offset) += c;
+				unsigned int ind = cursStrPos();
+				// if the cursor is at end of line
+				if ( ind == (unsigned int) lines.at( cursRow ).size() - 1 )
+					lines.at( cursRow ) += c;
 				else
-					lines.at(cursorY-1+offset).insert( lines.at(cursRow).begin() + cursStrPos(), c );
+					lines.at( cursRow ).insert( lines.at(cursRow).begin() + ind, c );
+				cursorX = cursLinePos( ind + 1 );
+				return;
+				if ( cursorX > (unsigned int) lineSize( lines.at(cursRow) )+1)
+					lines.at(cursRow) += c;
+				else
+					lines.at(cursRow).insert( lines.at(cursRow).begin() + cursStrPos(), c );
 				//cursorX++;
 				cursRight();
 			} else {
-				lines.at(cursorY-1+offset).append(1,c);
+				lines.at(cursRow).append(1,c);
 				//cursorX++;
 				cursRight();
 				cursRight();
@@ -599,7 +630,7 @@ class Terminal
 
 			// if the line is empty or at end of line, add empty line below
 			if ( lines.at( cursRow ).empty() || cursorX > lineSize( lines.at( cursRow ) ) ) {
-				lines.insert( lines.begin() + cursRow + 1, "" );
+				lines.insert( lines.begin() + cursRow + 1, " " );
 				cursDown();
 				return;
 			}
@@ -607,6 +638,8 @@ class Terminal
 			// move substr to the line below
 			lines.insert( lines.begin() + cursRow + 1, lines.at( cursRow ).substr( cursStrPos(), lines.at( cursRow ).size() - cursStrPos() ) );
 			lines.at( cursRow ).erase( lines.at( cursRow ).begin() + cursStrPos(), lines.at( cursRow ).end() );
+			// add space to end of lines
+			lines.at( cursRow ) += ' ';
 
 			// move 
 			//cursorY++;
@@ -624,6 +657,7 @@ class Terminal
 			OFSTREAM outFile( fileName );
 			
 			for (unsigned int i = 0; i < lines.size(); i++) {
+				lines.at(i).erase( lines.at(i).end() - 1 ); // erase the last space in each line
 				outFile << lines.at(i) << "\n";
 			}
 			outFile.close();
