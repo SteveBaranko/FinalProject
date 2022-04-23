@@ -493,46 +493,33 @@ class Terminal
 		}
 
 		void cursClick(){
-			int cnt=0;
 			unsigned int x=0,y=0;
-			unsigned long long mask;
-			void *ppt;
-			void **nums=(void**) malloc(100*sizeof(void*));
-			for(int i=0;i<100;i++)
-				nums[i]=(void*)malloc(6*sizeof(char));
-			void *empty=malloc(2*sizeof(char));
 			struct winsize w;
-			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w);
-			//fprintf(stdout,"\033[?1000h");
-			fread((void*)nums[cnt],1,6,stdin);
-			mask=0x80;
-			ppt=(void*)(4+(char*)nums[cnt]);
-			if(mask & *(unsigned long*) ppt){
-				fread(empty,1,1,stdin);
-				ppt=(void*)(1+(char*)empty);
-				*(char*) ppt=*(char*)(void*)(5+(char*)nums[0]);
-				ppt=(void*)(5+(char*)nums[0]);
-				fread(ppt,1,1,stdin);
-			}
-			mask=0xFF;
-			x=(unsigned int) mask & *(unsigned int*)ppt;
-			if(x<128){
-				ppt=(void*)(5+(char*)nums[cnt]);
-				y=(unsigned int)mask & *(unsigned int*)ppt;
-				y-=32;
+			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w); //gets window size
+			char test;
+			CIN.get(test); //flushes leading input
+			CIN.get(test); //x coordinate of mouse
+			x=(unsigned int) test;
+			if(x<128){ //keeps x in range
+				CIN.get(test); //y coordinate of mouse
+				y=(unsigned int) test;
+				y-=32; //converts y coordinate to window size
 				if(y>(unsigned int)lines.size()-2)
-					y=(unsigned int)lines.size()-2;
-				cursorY=y;
+					y=(unsigned int)lines.size()-2; //keeps cursor in range of file
+				cursorY=y; //sets cursor
 				x-=32;
 				if(x>(unsigned int)lines.at(cursorY-1+offset).size())
-					x=(unsigned int)lines.at(cursorY-1+offset).size()+1;
+					x=(unsigned int)lines.at(cursorY-1+offset).size()+1; //limits cursor to end of line
 				cursorX=x;
 			}
-			//system("clear");
-			//fprintf(stdout,"%d %d\n",cursorX,cursorY);
-			//fprintf(stdout,"\033[?1000l");
-			//exit(0);
-			cnt++;
+			else
+				CIN.get(test); //flushes y output if x out of range
+			CIN.get(test); //flush rest of mouse input that is not used
+			CIN.get(test);
+			CIN.get(test);
+			CIN.get(test);
+			CIN.get(test);
+			CIN.get(test);
 		}
 		
 		void backspaceChar( ) {

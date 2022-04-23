@@ -38,7 +38,6 @@ void enableRawMode(void){
 void getInput( Terminal& Main )
 {
 	char c;
-	//Main.cursClick();
 	fprintf(stdout,"\033[?1000h");
 	CIN.get(c);
 	if (c == (char) 127) { Main.backspaceChar(); return; }
@@ -53,6 +52,7 @@ void getInput( Terminal& Main )
 			if ( c != CTRL('q') )
 				return;
 		}
+		fprintf(stdout,"\033[?1000l");
 		Main.close(); 
 		return; 
 	}
@@ -63,10 +63,6 @@ void getInput( Terminal& Main )
 		CIN.get(c);
 		if (c == '[') {
 			CIN.get(c);
-			//system("clear");
-			//fprintf(stdout,"%d\n",c);
-			//fprintf(stdout,"\033[?1000l");
-			exit(0);
 			switch (c) {
 				case 'A':
 					Main.cursUp();
