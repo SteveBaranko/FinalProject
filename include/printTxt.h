@@ -517,7 +517,7 @@ class Terminal
 			void *empty=malloc(2*sizeof(char));
 			struct winsize w;
 			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w);
-			fprintf(stdout,"\033[?1000h");
+			//fprintf(stdout,"\033[?1000h");
 			fread((void*)nums[cnt],1,6,stdin);
 			mask=0x80;
 			ppt=(void*)(4+(char*)nums[cnt]);
@@ -544,7 +544,7 @@ class Terminal
 			}
 			//system("clear");
 			//fprintf(stdout,"%d %d\n",cursorX,cursorY);
-			fprintf(stdout,"\033[?1000l");
+			//fprintf(stdout,"\033[?1000l");
 			//exit(0);
 			cnt++;
 		}
