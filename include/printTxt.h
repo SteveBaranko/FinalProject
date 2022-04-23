@@ -296,7 +296,10 @@ class Terminal
 			sz += 1;
 			for (unsigned int i = 1; i <= ind; i++) {
 				if ( lines.at(cursRow).at(i-1) == '\t') {
-					sz += (unsigned int) 1 + tabLen - (sz % tabLen);
+					if ( (sz % tabLen) == 0 )
+						sz++;
+					else
+						sz += (unsigned int) 1 + tabLen - (sz % tabLen);
 				} else {
 					sz++;
 				}
