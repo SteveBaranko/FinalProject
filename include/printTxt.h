@@ -308,12 +308,13 @@ class Terminal
 			//unsigned int cursCol = (unsigned int) cursorX-1;
 			unsigned int sz = 0;
 
-			if ( ind > (unsigned int) lines.at(cursRow).size() )
+			if ( ind >= (unsigned int) lines.at(cursRow).size() )
 				return lineSize( lines.at(cursRow) );
 
-			for (unsigned int i = 0; i <= ind; i++) {
-				if ( lines.at(cursRow).at(i) == '\t') {
-					sz += (unsigned int) tabLen - (sz % tabLen);
+			sz += 1;
+			for (unsigned int i = 1; i <= ind; i++) {
+				if ( lines.at(cursRow).at(i-1) == '\t') {
+					sz += (unsigned int) 1 + tabLen - (sz % tabLen);
 				} else {
 					sz++;
 				}
@@ -435,6 +436,16 @@ class Terminal
 			cursorX = cursLinePos( (unsigned int) ind + 1 );
 
 			return;
+			STRSTREAM ss;
+			if ( !lines.at( cursRow ).empty() ) {
+				ss << lines.at( cursRow ).at( cursStrPos() );
+				ss << " ( " << cursStrPos() << " )";
+				ss << " | cursStrPos(): " << cursStrPos();
+				ss << " | cursLinePos(): " << cursLinePos( (unsigned int) ind+1 );
+				fileStatus( ss.str(), row );
+			}
+			return;
+
 			if (cursorX < (unsigned int) col)
 				cursorX++;
 			
@@ -479,15 +490,20 @@ class Terminal
 			unsigned int ind = cursStrPos();
 			// if the index is 0, set cursor to left side of screen
 			if (ind == 0) {
-				if ( lines.at(cursRow).at(ind) != '\t' )
-					cursorX = 1;
-				else
-					cursorX = tabLen;
 				return;
 			}
 
 			// set cursor to the char position to left
 			cursorX = cursLinePos( (unsigned int) ind - 1 );
+			return;
+			STRSTREAM ss;
+			if ( !lines.at( cursRow ).empty() ) {
+				ss << lines.at( cursRow ).at( cursStrPos() );
+				ss << " ( " << cursStrPos() << " )";
+				ss << " | cursStrPos(): " << cursStrPos();
+				ss << " | cursLinePos(): " << cursLinePos( (unsigned int) ind-1 );
+				fileStatus( ss.str(), row );
+			}
 
 			return;
 		}
@@ -501,8 +517,11 @@ class Terminal
 			if (cursorY > (unsigned int) lines.size() - offset)
 				cursorY = (unsigned int) lines.size() - offset;
 			// keep the cursor off space between tabs
-			cursRight();
-			cursLeft();
+			// fix this later
+			unsigned int ind = cursStrPos();
+			cursorX = cursLinePos( ind );
+			//cursRight();
+			//cursLeft();
 			return;
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
@@ -515,8 +534,10 @@ class Terminal
 			else
 				if ( offset > 0 ) offset--;
 			// keep the cursor off space between tabs
-			cursRight();
-			cursLeft();
+			unsigned int ind = cursStrPos();
+			cursorX = cursLinePos( ind );
+			//cursRight();
+			//cursLeft();
 			return;
 			// limit cursor to right by line size
 			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
@@ -525,14 +546,14 @@ class Terminal
 
 		void backspaceChar( ) {
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			unsigned int cursCol = (unsigned int) cursorX-1;
+			//unsigned int cursCol = (unsigned int) cursorX-1;
 			// debugging, printing cursor location
 			STRSTREAM ss;
-			ss << "(" << cursCol << ", " << cursRow << ")";
+			//ss << "(" << cursCol << ", " << cursRow << ")";
 			//fileStatus( ss.str(), row );
 			dirty = true;
 
-			if ( lines.at(cursRow).empty() ) {
+			if ( lines.at(cursRow).size() == 1) {
 				// if the line is empty, delete the row
 				// only delete row if it is not the first
 				if ( cursRow > 0 ) {
@@ -591,7 +612,8 @@ class Terminal
 		void deleteChar( ) {
 			dirty = true;
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			if ( lines.at(cursRow).empty() )
+			unsigned int ind = cursStrPos();
+			if ( ind == (unsigned int) lines.at( cursRow ).size() - 1 )
 				return;
 			lines.at(cursRow).erase( cursStrPos(), 1 );
 		}
