@@ -55,14 +55,6 @@ class Terminal
 			
 			STRING word;
 
-			/*
-			// Testing Cursor movement and lineSize()
-			COUT << "\033[2K";
-			COUT << line << " (lineSize: " << lineSize(line) << ")" << ENDL;
-			return;
-			*/
-			
-
 			// split each character in the line into a vector of words
 			VECTOR< STRING > words;
 			unsigned int prevGrp;
@@ -81,7 +73,7 @@ class Terminal
 
 			// change this later, for now limit line to the size of the
 			// screen so it doesn't overflow
-			while ( col < lineSize( line ) ) {
+			while ( col < (unsigned int) lineSize( line )) {
 				line = line.substr( 0 , line.size() - 1);
 			}
 
@@ -150,7 +142,6 @@ class Terminal
 						// keep adding the number of spaces added to print line
 						printSz += tabLen - (printSz % tabLen);
 					}
-					//COUT << CSI << "38;2;100;0;100m";
 					continue;
 				}
 				// if the word is not usually colored, or word is in a quote or a comment, then print
@@ -171,10 +162,6 @@ class Terminal
 			COUT << ENDL;
 
 			return;
-			// this function will format and print a line
-			// change this to add coloring later
-			// COUT << "\033[2K";
-			// COUT << line << ENDL;
 		}
 
 
@@ -231,7 +218,6 @@ class Terminal
 		void highlightBar( unsigned int rowSz )
 		{
 			// print a highlighted bar at the end of the text editor
-			//COUT << "\033[42m";
 			COUT << PNT_BAR_TO_END;
 			// print fileName
 			COUT << CSI << "38;2;10;10;10m";
@@ -239,7 +225,6 @@ class Terminal
 			// print spaces for the rest row
 			for (unsigned int i = (unsigned int) fileName.size(); i < rowSz; i++)
 				COUT << " ";
-			//COUT << "\033[m";
 			COUT << CLEAR_FORMAT;
 			COUT << ENDL;
 		}
@@ -259,7 +244,6 @@ class Terminal
 			COUT << "\033[2K";
 			COUT << status;
 			COUT << CLEAR_FORMAT;
-			//COUT << "\033[m";
 		}
 
 		unsigned int lineSize( STRING line )
@@ -278,7 +262,6 @@ class Terminal
 				sz++;
 			}
 			return sz;
-			//return (unsigned int) line.size();	
 		}
 		
 		unsigned int cursStrPos( void )
@@ -305,7 +288,6 @@ class Terminal
 			// return the cursor position on screen given the char
 			// of the cursor in the string
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			//unsigned int cursCol = (unsigned int) cursorX-1;
 			unsigned int sz = 0;
 
 			if ( ind >= (unsigned int) lines.at(cursRow).size() )
@@ -384,13 +366,6 @@ class Terminal
 					continue;
 				}
 				// replace tabs with spaces, fix later
-				/*
-				if ( c == '\t' ) {
-					lineStr.push_back(' ');
-					lineStr.push_back(' ');
-					continue;
-				}
-				*/
 				lineStr.push_back(c);
 			}
 
@@ -409,7 +384,6 @@ class Terminal
 		{
 			// add warning to bottom of text editor
 			fileStatus( warning, row);
-			//fileStatus( fileName, row );
 		}
 
 		void close( ) {
@@ -430,41 +404,21 @@ class Terminal
 			unsigned int ind = cursStrPos();
 
 			// check if at last char in string
-			if ( ind == (unsigned int) lines.at(cursRow).size() - 1 )
+			if ( ind == (unsigned int) lines.at(cursRow).size() - 1 ) {
 				return;
+			}
 
 			cursorX = cursLinePos( (unsigned int) ind + 1 );
 
 			return;
+			// Debugging
+			/*
 			STRSTREAM ss;
 			if ( !lines.at( cursRow ).empty() ) {
 				ss << lines.at( cursRow ).at( cursStrPos() );
 				ss << " ( " << cursStrPos() << " )";
 				ss << " | cursStrPos(): " << cursStrPos();
 				ss << " | cursLinePos(): " << cursLinePos( (unsigned int) ind+1 );
-				fileStatus( ss.str(), row );
-			}
-			return;
-
-			if (cursorX < (unsigned int) col)
-				cursorX++;
-			
-			if ( !lines.at( cursRow ).empty() )
-				if ( lines.at( cursRow ).at( cursStrPos() ) == '\t' )
-					cursorX += (unsigned int) 1 + tabLen - (cursorX % tabLen);
-					
-
-			// limit cursor to right by line size
-			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1)
-				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 2;
-
-			return;
-			/*
-			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			STRSTREAM ss;
-			if ( !lines.at( cursRow ).empty() ) {
-				ss << lines.at( cursRow ).at( cursStrPos() );
-				ss << " ( " << cursStrPos() << " )";
 				fileStatus( ss.str(), row );
 			}
 			*/
@@ -496,6 +450,8 @@ class Terminal
 			// set cursor to the char position to left
 			cursorX = cursLinePos( (unsigned int) ind - 1 );
 			return;
+			// Debugging
+			/*
 			STRSTREAM ss;
 			if ( !lines.at( cursRow ).empty() ) {
 				ss << lines.at( cursRow ).at( cursStrPos() );
@@ -504,8 +460,7 @@ class Terminal
 				ss << " | cursLinePos(): " << cursLinePos( (unsigned int) ind-1 );
 				fileStatus( ss.str(), row );
 			}
-
-			return;
+			*/
 		}
 
 		void cursDown( ) {
@@ -520,12 +475,7 @@ class Terminal
 			// fix this later
 			unsigned int ind = cursStrPos();
 			cursorX = cursLinePos( ind );
-			//cursRight();
-			//cursLeft();
 			return;
-			// limit cursor to right by line size
-			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
-				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 		}
 
 		void cursUp( ) {
@@ -536,21 +486,11 @@ class Terminal
 			// keep the cursor off space between tabs
 			unsigned int ind = cursStrPos();
 			cursorX = cursLinePos( ind );
-			//cursRight();
-			//cursLeft();
 			return;
-			// limit cursor to right by line size
-			if (cursorX > (unsigned int) lines.at(cursorY-1+offset).size() )
-				cursorX = (unsigned int) lines.at(cursorY-1+offset).size() + 1;
 		}
 
 		void backspaceChar( ) {
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			//unsigned int cursCol = (unsigned int) cursorX-1;
-			// debugging, printing cursor location
-			STRSTREAM ss;
-			//ss << "(" << cursCol << ", " << cursRow << ")";
-			//fileStatus( ss.str(), row );
 			dirty = true;
 
 			if ( lines.at(cursRow).size() == 1) {
@@ -586,26 +526,10 @@ class Terminal
 				return;
 			} 
 
-			// if at front of tab, delete it
-			
-			/*
-			if ( lines.at(cursRow).at( cursStrPos() ) == '\t' ) {
-				lines.at(cursRow).erase( cursStrPos(), 1 );
-				cursLeft();
-				cursRight();
-				return;
-			}
-			*/
-
 			// otherwise, move cursor to left and delete char
 			lines.at(cursRow).erase( ind-1, 1 );
 			cursorX = cursLinePos( ind-1 );
 
-			return;
-			// if at end of line, move back to right
-			if ( cursorX > lineSize( lines.at(cursRow) ) )
-				cursRight();
-			
 			return;
 		}
 
@@ -622,27 +546,11 @@ class Terminal
 			dirty = true;
 			// get the row of the cursor
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			if ( !lines.at(cursRow).empty() ) {
-				unsigned int ind = cursStrPos();
-				// if the cursor is at end of line
-				if ( ind == (unsigned int) lines.at( cursRow ).size() - 1 )
-					lines.at( cursRow ) += c;
-				else
-					lines.at( cursRow ).insert( lines.at(cursRow).begin() + ind, c );
-				cursorX = cursLinePos( ind + 1 );
-				return;
-				if ( cursorX > (unsigned int) lineSize( lines.at(cursRow) )+1)
-					lines.at(cursRow) += c;
-				else
-					lines.at(cursRow).insert( lines.at(cursRow).begin() + cursStrPos(), c );
-				//cursorX++;
-				cursRight();
-			} else {
-				lines.at(cursRow).append(1,c);
-				//cursorX++;
-				cursRight();
-				cursRight();
-			}
+			unsigned int ind = cursStrPos();
+			// if the cursor is at end of line
+			lines.at( cursRow ).insert( lines.at(cursRow).begin() + ind, c );
+			cursorX = cursLinePos( ind + 1 );
+			return;
 		}
 
 		void addLine( ) {
@@ -664,7 +572,6 @@ class Terminal
 			lines.at( cursRow ) += ' ';
 
 			// move 
-			//cursorY++;
 			cursDown();
 			cursorX = 1;
 		}
