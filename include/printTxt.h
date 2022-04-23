@@ -492,6 +492,36 @@ class Terminal
 			return;
 		}
 
+		void cursClick(){
+			unsigned int x=0,y=0;
+			struct winsize w;
+			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w); //gets window size
+			char test;
+			CIN.get(test); //flushes leading input
+			CIN.get(test); //x coordinate of mouse
+			x=(unsigned int) test;
+			if(x<128){ //keeps x in range
+				CIN.get(test); //y coordinate of mouse
+				y=(unsigned int) test;
+				y-=32; //converts y coordinate to window size
+				if(y>(unsigned int)lines.size()-2)
+					y=(unsigned int)lines.size()-2; //keeps cursor in range of file
+				cursorY=y; //sets cursor
+				x-=32;
+				if(x>(unsigned int)lines.at(cursorY-1+offset).size())
+					x=(unsigned int)lines.at(cursorY-1+offset).size()+1; //limits cursor to end of line
+				cursorX=x;
+			}
+			else
+				CIN.get(test); //flushes y output if x out of range
+			CIN.get(test); //flush rest of mouse input that is not used
+			CIN.get(test);
+			CIN.get(test);
+			CIN.get(test);
+			CIN.get(test);
+			CIN.get(test);
+		}
+		
 		void backspaceChar( ) {
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 			dirty = true;

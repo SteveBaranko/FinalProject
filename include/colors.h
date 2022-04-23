@@ -25,8 +25,8 @@ class Colors
 	//COUT << CSI << "38;2;229;229;16m";
         Colors(): colors( ) {
             colors["if"]  =     "38;2;229;229;16m"; // yellow
-            colors["for"] =     "38;2;229;229;16m"; // magenta
-            colors["while"] =   "38;2;0;205;205m"; // green
+            colors["for"] =     "38;2;229;229;16m"; // yellow
+            colors["while"] =   "38;2;229;229;16m"; // yellow
 	    			colors["else"] =    "38;2;229;229;16m"; // yellow
 						colors["void"] = 		"38;2;0;205;205m"; // blue
 						colors["int"] = 		"38;2;0;205;205m"; // blue
@@ -40,7 +40,9 @@ class Colors
 						colors["public"] =	"38;2;0;205;205m"; // blue
 						colors["private"] =	"38;2;0;205;205m"; // blue
 						colors["return"] =	"38;2;0;205;205m"; // blue
-						colors["#include"]= "38;2;205;0;205m"; // magenta
+						colors["include"]= "38;2;205;0;205m"; // magenta
+						colors["true"]= "38;2;205;0;205m"; //magenta
+						colors["false"]= "38;2;205;0;205m"; //magenta
         }
         ~Colors() { }
 

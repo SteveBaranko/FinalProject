@@ -8,12 +8,10 @@
 #include "../include/vppFunc.h"
 #include "../include/colors.h"
 
-Terminal Main;
-
 int main(int argc, char* argv[]){
 
 	enableRawMode();
-	setHandlers();
+	//setHandlers();
 
 	if (argc < 2) {
 		// FIx this, testing printing to terminal
@@ -42,10 +40,8 @@ int main(int argc, char* argv[]){
  
 	struct winsize w;	// create a struct winsize w, which will give terminal size
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
-	//Main( w.ws_row, w.ws_col, argv[1] );
-	Main.updateSize( w.ws_row, w.ws_col );
-	Main.updateFilename( argv[1] );
 
+	Terminal Main( w.ws_row, w.ws_col, argv[1] );
 	//openFile( lines, inFile );
 	Main.openFile( inFile );
 
@@ -67,57 +63,8 @@ int main(int argc, char* argv[]){
 	COUT << "\033[0;0H";	// move cursor to top of terminal
 
 
-  //      Colors colors;
-  //      STRING no = "no";
-  //      if ( colors.find(no) != "" ) COUT << colors.find(no) <<ENDL;
+        Colors colors;
+        STRING no = "no";
+        if ( colors.find(no) != "" ) COUT << colors.find(no) <<ENDL;
 	return 0;
 }
-
-void sig_handler(int signum)
-{
-	// this function will take the signal
-	// and end the program
-	// eventually this will be used properly
-	// assign ctrl+z and ctrl+c and other things
-	switch(signum) {
-		case SIGSEGV:
-			COUT << CLEAR_SCREEN;
-			COUT << CURS_TO_TOP;
-			COUT << "\033[2J";		// clear the screen
-			COUT << "\033[0;0H";	// move cursor to top of terminal
-			COUT << "Segmentation fault (core dumped)" << ENDL;
-			exit(EXIT_SUCCESS);
-		case SIGINT:
-			Main.close();
-			Main.updateTerminal();
-			COUT << "\033[2J";		// clear the screen
-			COUT << "\033[0;0H";	// move cursor to top of terminal
-			exit(EXIT_SUCCESS);
-			//COUT << "SIGINT" << ENDL;
-			return;
-		case SIGCONT:
-			Main.close();
-			Main.updateTerminal();
-			COUT << "\033[2J";		// clear the screen
-			COUT << "\033[0;0H";	// move cursor to top of terminal
-			exit(EXIT_SUCCESS);
-			break;
-		default:
-			exit(EXIT_SUCCESS);
-			break;
-	}
-}
-
-
-void setHandlers(void)
-{
-	// function will set each of the necessary signals 
-	// we need to the handler in main
-	signal(SIGINT,sig_handler);
-	signal(SIGSEGV,sig_handler);
-	signal(SIGCONT,sig_handler);
-	return;
-}
-
-
-
