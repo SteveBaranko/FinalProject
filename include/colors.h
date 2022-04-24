@@ -40,7 +40,7 @@ class Colors
 						colors["public"] =	"38;2;0;205;205m"; // blue
 						colors["private"] =	"38;2;0;205;205m"; // blue
 						colors["return"] =	"38;2;0;205;205m"; // blue
-						colors["include"]= "38;2;205;0;205m"; // magenta
+						colors["#include"]= "38;2;205;0;205m"; // magenta
 						colors["true"]= "38;2;205;0;205m"; //magenta
 						colors["false"]= "38;2;205;0;205m"; //magenta
         }

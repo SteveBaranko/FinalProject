@@ -504,16 +504,21 @@ class Terminal
 				CIN.get(test); //y coordinate of mouse
 				y=(unsigned int) test;
 				y-=32; //converts y coordinate to window size
-				if(y>(unsigned int)lines.size()-2)
-					y=(unsigned int)lines.size()-2; //keeps cursor in range of file
+				if(y>(unsigned int)lines.size())
+					y=(unsigned int)lines.size(); //keeps cursor in range of file
+				if(y>(unsigned int) row-2)
+					y=(unsigned int) row-2; // keeps cursor in usable space
 				cursorY=y; //sets cursor
 				x-=32;
-				if(x>(unsigned int)lines.at(cursorY-1+offset).size())
-					x=(unsigned int)lines.at(cursorY-1+offset).size()+1; //limits cursor to end of line
+				if(x>(unsigned int)lineSize(lines.at(cursorY-1+offset))) 
+					x=(unsigned int)lineSize(lines.at(cursorY-1+offset)); //limits cursor to end of line
 				cursorX=x;
 			}
-			else
+			else {
 				CIN.get(test); //flushes y output if x out of range
+				CIN.get(test); //flushes y output if x out of range
+				CIN.get(test); //flushes y output if x out of range
+			}
 			CIN.get(test); //flush rest of mouse input that is not used
 			CIN.get(test);
 			CIN.get(test);
