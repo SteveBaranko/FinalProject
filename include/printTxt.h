@@ -680,6 +680,7 @@ class Terminal
 			// move 
 			cursDown();
 			cursorX = 1;
+			horizOffset = 0;
 		}
 
 		void pageUp( ) {
