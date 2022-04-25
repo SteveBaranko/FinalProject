@@ -64,7 +64,7 @@ class Terminal
 		// rn we are changing the line 
 		// so pass by value, not reference
 		//void printLine( STRING& line )
-		void printLine( STRING line )
+		void printLine( STRING line, size_t line_num )
 		{
 
 			Colors colors;
@@ -97,7 +97,7 @@ class Terminal
 			while ( col < (unsigned int) lineSize( line )) {
 				line = line.substr( 0 , line.size() - 1);
 			}
-
+                        
 			// add each word and spaces to vector 
 			for ( char &i : line ) {
 				// this if statement will ignore first character
@@ -128,6 +128,7 @@ class Terminal
 			bool comment = false;
 			bool quotes = false;
 			COUT << "\033[2K";
+                        COUT << CSI << "48:5:166m" << line_num << COLORS_NORMAL << ' ';
 			// loop through each word in words
 			for ( STRING &wrd : words ) {
 				// if wrd is "//", this line is a comment
@@ -371,7 +372,7 @@ class Terminal
 			COUT << CURS_TO_TOP;	// move cursor to top of terminal
 			for (unsigned int i = 0; i < (unsigned int) row-2; i++) {
 				if ( i < (unsigned int) lines.size() - offset ) {
-					printLine( lines.at(i+offset) );
+					printLine( lines.at(i+offset), i + offset + 1);
 				} else {
 					printLine();
 				}

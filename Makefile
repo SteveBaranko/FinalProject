@@ -33,9 +33,6 @@ $(OBJ)/colorPrint.o: $(SRC)/colorPrint.cpp
 $(OBJ)/readIn.o: $(SRC)/readIn.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/readIn.cpp -o $@
 
-$(OBJ)/printTxt.o: $(SRC)/printTxt.cpp $(INC)/printTxt.h
-	$(CC) $(CXXFLAGS) -c $(SRC)/printTxt.cpp -o $@
-
 $(OBJ)/sigController.o: $(SRC)/sigController.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/sigController.cpp -o $@
 
@@ -45,7 +42,7 @@ $(OBJ)/vppFunc.o: $(SRC)/vppFunc.cpp
 $(OBJ)/vpp.o: $(SRC)/vpp.cpp
 	$(CC) $(CXXFLAGS) -c $(SRC)/vpp.cpp -o $@
 
-vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o $(OBJ)/printTxt.o 
+vppObjs := $(OBJ)/vpp.o $(OBJ)/vppFunc.o $(OBJ)/readIn.o 
 
 vpp: $(vppObjs) 
 	$(CC) $(CXXFLAGS) -o $(EXE)/vpp $(vppObjs) 
