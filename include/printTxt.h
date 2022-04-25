@@ -3,7 +3,6 @@
 // This file will contain the function declarations for printTxt.cpp
 
 
-
 #ifndef printTxt_H
 #define printTxt_H
 
@@ -14,6 +13,7 @@
 #include<sstream>
 #include<vector>
 #include<cctype>
+#include<cstring>
 
 // C libraries to include
 #include<sys/ioctl.h>
@@ -21,7 +21,8 @@
 #include<termios.h>
 #include "defines.h"
 #include "colors.h"
-#include "../include/colorPrint.h"
+#include "colorPrint.h"
+#include "readIn.h"
 
 void print_terminal(VECTOR<STRING>& lines);
 void printLine( STRING& line );
@@ -41,6 +42,7 @@ class Terminal
 		unsigned int cursorX;
 		unsigned int cursorY;
 		unsigned int offset;
+		unsigned int horizOffset;
 		bool open;
 		bool dirty;
 		unsigned int tabLen;
@@ -59,14 +61,19 @@ class Terminal
 			VECTOR< STRING > words;
 			unsigned int prevGrp;
 			unsigned int currGrp;
-			// if the line is empty, print nothing and exit function
-			if ( line.empty() ) {
+			// if the line is empty or if line is less than horizOffset, print nothing and exit function
+			if ( line.empty() || horizOffset > lineSize(line) ) {
 				COUT << "\033[2K";
-				COUT << line;
 				COUT << COLORS_NORMAL;
 				COUT << ENDL;
 				return;
 			}
+
+			// only get the line at the horizontal offset
+			unsigned int hInd = cursStrPos( line, horizOffset+1 );
+			line = line.substr( hInd, line.size() - hInd );
+
+			// establish what group the first char is in
 			bool first = true;
 			prevGrp = charGroup( line.at(0) );
 			word.push_back( line.at(0) );
@@ -268,6 +275,8 @@ class Terminal
 		{
 			// return the position of the cursor in the string
 			// with its current position in the screen
+			// 
+			// screen -> index
 			unsigned int sz = 0;
 			for (unsigned int i = 0; i < (unsigned int) lines.at(cursorY-1+offset).size(); i++) {
 				if ( lines.at(cursorY-1+offset).at(i) == '\t') {
@@ -275,18 +284,41 @@ class Terminal
 				} else {
 					sz++;
 				}
-				if (sz == cursorX)
+				if (sz == cursorX+horizOffset)
 					return i;
-				if (sz > cursorX)
+				if (sz > cursorX+horizOffset)
 					return (unsigned int) i;
 			}
 			return (unsigned int) lines.at(cursorY-1+offset).size()-1;
+		}
+
+		unsigned int cursStrPos( STRING line, unsigned int xPos )
+		{
+			// return the position of the cursor in the string
+			// with its current position in the screen
+			// 
+			// screen -> index
+			unsigned int sz = 0;
+			for (unsigned int i = 0; i < (unsigned int) line.size(); i++) {
+				if ( line.at(i) == '\t'){
+					sz += (unsigned int) tabLen - (sz % tabLen);
+				} else {
+					sz++;
+				}
+				if (sz == xPos)
+					return i;
+				if (sz > xPos)
+					return (unsigned int) i;
+			}
+			return (unsigned int) line.size()-1;
 		}
 
 		unsigned int cursLinePos( unsigned int ind )
 		{
 			// return the cursor position on screen given the char
 			// of the cursor in the string
+			//
+			// index -> screen
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 			unsigned int sz = 0;
 
@@ -304,13 +336,13 @@ class Terminal
 					sz++;
 				}
 			}
-			return sz;		
+			return (unsigned int) sz - horizOffset;		
 		}
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), open( true ), dirty( false ), tabLen( 4 ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ) { }
 		~Terminal( ) { }
 
 		
@@ -368,11 +400,18 @@ class Terminal
 					lineStr.clear();
 					continue;
 				}
-				// replace tabs with spaces, fix later
 				lineStr.push_back(c);
 			}
 
+			if ( lines.size() == 0 )
+				createFile();
+
 			inFile.close();
+		}
+
+		void createFile( ) {
+			// create one empty string to start out with
+			lines.push_back( " " );
 		}
 
 		bool isOpen( ) {
@@ -408,8 +447,12 @@ class Terminal
 
 			// check if at last char in string
 			if ( ind == (unsigned int) lines.at(cursRow).size() - 1 ) {
+				//addWarning( "BLEH" );
 				return;
 			}
+		
+			if ( cursorX == col )
+				horizOffset += tabLen;
 
 			cursorX = cursLinePos( (unsigned int) ind + 1 );
 
@@ -447,8 +490,12 @@ class Terminal
 			unsigned int ind = cursStrPos();
 			// if the index is 0, set cursor to left side of screen
 			if (ind == 0) {
+				cursorX = 0;
 				return;
 			}
+
+			if ( cursorX == 1 )
+				horizOffset -= tabLen;
 
 			// set cursor to the char position to left
 			cursorX = cursLinePos( (unsigned int) ind - 1 );
@@ -474,8 +521,13 @@ class Terminal
 			// limit cursor to only lines of the file
 			if (cursorY > (unsigned int) lines.size() - offset)
 				cursorY = (unsigned int) lines.size() - offset;
+			
+			// move horizontal offset to keep text on screen
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			while ( horizOffset > lineSize( lines.at(cursRow) ) )
+				horizOffset -= tabLen;
+
 			// keep the cursor off space between tabs
-			// fix this later
 			unsigned int ind = cursStrPos();
 			cursorX = cursLinePos( ind );
 			return;
@@ -486,6 +538,12 @@ class Terminal
 				cursorY--;
 			else
 				if ( offset > 0 ) offset--;
+
+			// move horizontal offset to keep text on screen
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			while ( horizOffset > lineSize( lines.at(cursRow) ) )
+				horizOffset -= tabLen;
+
 			// keep the cursor off space between tabs
 			unsigned int ind = cursStrPos();
 			cursorX = cursLinePos( ind );
@@ -614,11 +672,40 @@ class Terminal
 			cursorX = 1;
 		}
 
-		void save( void ) {
-			// fix this later
-			if ( fileName.empty() )
+		void pageUp( ) {
+			// create an signed integer variable to check if offset goes negative
+			int overflowOffset = (int) offset;
+			// move the offset
+			overflowOffset -= 10;
+			// keep offset from going where it shouldn't go
+			if ( overflowOffset <= 0 ) {
+				offset = 0;
 				return;
+			}
+			// overflow is not negative, update value
+			offset = (unsigned int) overflowOffset;
+		}
 
+		void pageDown( ) {
+			// move the offset
+			offset += 10;
+			// keep cursor on available lines
+			cursorY = 1;
+			// keep the offset from where it shouldn't go
+			if ( offset >= (unsigned int) lines.size() - 1 ) {
+				offset = (unsigned int) lines.size() - 1;
+				cursorY = 1;
+				return;
+			}
+		}
+
+		void save( void ) {
+			// in case nothing is given, default filename is vppEdit
+			if ( fileName.empty() ) {
+				updateFilename( "vppEdit" );
+			}
+
+			// make file clean
 			dirty = false;
 
 			OFSTREAM outFile( fileName );
