@@ -833,10 +833,14 @@ class Terminal
 			dirty = false;
 
 			OFSTREAM outFile( fileName );
+
+			STRING outLine;
 			
 			for (unsigned int i = 0; i < lines.size(); i++) {
-				// lines.at(i).erase( lines.at(i).end() - 1 ); // erase the last space in each line
-				outFile << lines.at(i) << "\n";
+				//lines.at(i).erase( lines.at(i).end() - 1 ); // erase the last space in each line
+				outLine = lines.at(i).substr( 0, lines.at(i).size()-1 );
+				outFile << outLine << "\n";
+				outLine.clear();
 			}
 			outFile.close();
 		}
