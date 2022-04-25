@@ -14,14 +14,25 @@
 #include<sstream>
 #include<vector>
 #include<cctype>
+#include<stack>
+#include<tuple>
+#include<sstream>
 
 // C libraries to include
 #include<sys/ioctl.h>
 #include<unistd.h>
 #include<termios.h>
+#include <stdio.h>
 #include "defines.h"
 #include "colors.h"
 #include "../include/colorPrint.h"
+
+#define TUPLE std::tuple
+#define MAKE_TUPLE std::make_tuple
+#define STACK std::stack
+#define GET std::get
+#define OSTRINGSTREAM std::ostringstream
+
 
 void print_terminal(VECTOR<STRING>& lines);
 void printLine( STRING& line );
@@ -29,6 +40,7 @@ void printLine( void );
 void highlightBar( unsigned int rowSz );
 void fileStatus( unsigned int row );
 void fileStatus( STRING status, unsigned int row );
+void checkParentheses ();
 
 class Terminal
 {
@@ -43,6 +55,7 @@ class Terminal
 		unsigned int offset;
 		bool open;
 		bool dirty;
+                bool bad_p;
 		unsigned int tabLen;
 		
 		// rn we are changing the line 
@@ -345,6 +358,102 @@ class Terminal
 
 		}
 
+                void checkParentheses () {
+
+                    // this function checks if the parenthesis entered in the file are valid, very similiar to the LeetCode "Valid Parenthesis" Problem
+                    bad_p = false;
+                    TUPLE <char, size_t, size_t> temp;
+                    STACK <TUPLE < char, size_t, size_t>> p_stack;
+                    // STACK <char> p_stack;
+                    STRING warning;
+                    OSTRINGSTREAM warning_draft;
+
+                    for ( size_t i = 0; i < lines.size(); ++i ) {
+                        for ( size_t j = 0; j < lines[i].size(); ++j ) {
+                            // opening parenthesis
+                            if ( ( lines[i][j] == '(' ) || ( lines[i][j] == '[' ) || ( lines[i][j] == '{' ) ) {
+                                temp = MAKE_TUPLE( lines[i][j], i, j ); 
+                                p_stack.push(temp);
+                           // closing parenthesis
+                            } else if ( lines[i][j] == ')' ) {
+                                // if no corresponding parenthesis
+                                if ( p_stack.empty() ) {
+                                    bad_p = true;
+                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning = warning_draft.str();
+                                    this->addWarning( warning );
+                                    return;
+                                }
+                                // If mismatched parenthesis
+                                if ( GET<0>(p_stack.top()) != '(' ) {
+                                    bad_p = true;
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning = warning_draft.str();
+                                    this->addWarning( warning );
+                                    return;
+                                } else {
+                                    p_stack.pop();
+                                    continue;
+                                }
+                            // brackets
+                            } else if ( lines[i][j] == ']' ) {
+                                // if no corresponding brackets
+                                if ( p_stack.empty() ) {
+                                    bad_p = true;
+                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning = warning_draft.str();
+                                    this->addWarning( warning );
+                                    return;
+                                }
+                                // if mismatched brackets
+                                if ( GET<0>(p_stack.top()) != '[' ) {
+                                    bad_p = true;
+                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning = warning_draft.str();
+                                    this->addWarning( warning );
+                                    return;
+                                } else {
+                                    p_stack.pop();
+                                    continue;
+                                }
+                            // curly braces
+                            } else if ( lines[i][j] == '}' ) {
+                                // if no corresponding braces
+                                if ( p_stack.empty() ) {
+                                    bad_p = true;
+                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning = warning_draft.str();
+                                    this->addWarning( warning );
+                                    return;
+                                }
+                                // if mismatched braces
+                                if ( GET<0>(p_stack.top()) != '{' ) {
+                                    bad_p = true;
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning = warning_draft.str();
+                                    this->addWarning( warning );
+                                    return;
+                                } else {
+                                    p_stack.pop();
+                                    continue;
+                                }
+                           // other (ie non parenthetical character)
+                            } else {
+                                continue;
+                            }
+                        }
+                    }
+                    // If unmatched open parenthesis
+                    if ( !p_stack.empty() ) {
+                        bad_p = true;
+                        warning_draft << "Error: Unmatched Parenthsis OPENING at: (" << GET<1>(p_stack.top()) << ", " << GET<2>(p_stack.top()) << ")";
+                        warning = warning_draft.str();
+                        this->addWarning( warning );
+                        return;
+                    }
+                }
+                    
+
 		void openFile(IFSTREAM& inFile) {
 			// this function will receive a file stream, read the lines of the 
 			// file into a vector of strings passed by reference, then close
@@ -382,13 +491,16 @@ class Terminal
 		bool isDirty( ) {
 			return dirty;
 		}
+		bool isBadP( ) {
+			return bad_p;
+		}
 
 		void addWarning( STRING warning )
 		{
 			// add warning to bottom of text editor
 			fileStatus( warning, row);
 		}
-
+		
 		void close( ) {
 			open = false;
 		}
@@ -624,7 +736,7 @@ class Terminal
 			OFSTREAM outFile( fileName );
 			
 			for (unsigned int i = 0; i < lines.size(); i++) {
-				lines.at(i).erase( lines.at(i).end() - 1 ); // erase the last space in each line
+				// lines.at(i).erase( lines.at(i).end() - 1 ); // erase the last space in each line
 				outFile << lines.at(i) << "\n";
 			}
 			outFile.close();

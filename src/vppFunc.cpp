@@ -40,6 +40,7 @@ void getInput( Terminal& Main )
 	char c;
 	fprintf(stdout,"\033[?1000h");
 	CIN.get(c);
+        Main.addWarning( " " );
 	if (c == (char) 127) { Main.backspaceChar(); return; }
 	if (c == '~') { Main.deleteChar(); return; }
 	if (c == (char) 13) { Main.addLine(); return; }
@@ -56,7 +57,17 @@ void getInput( Terminal& Main )
 		Main.close(); 
 		return; 
 	}
-	if (c == CTRL('s')) { Main.save(); return; }
+	if (c == CTRL('s')) {
+            Main.checkParentheses();
+
+            if ( Main.isBadP() ) {
+                return;
+            } else {
+                Main.save(); 
+		Main.addWarning( "Progress Saved." );
+                return;
+            }
+        }
 	//if (c == 'p') Main.close();
 	//if (c == '\x1b') { Main.close(); return; }
 	if (c == '\x1b') {
@@ -85,7 +96,29 @@ void getInput( Terminal& Main )
 		}
 		return;
 	}
-	Main.insertChar( c );
+        // auto-complete parentheses
+        if ( c == '(' || c == '{' || c == '[' ) {
+            switch (c) {
+                case '(':
+                    Main.insertChar( c );
+                    Main.insertChar( ')' );
+                    Main.cursLeft();
+                    break;
+                case '[':
+                    Main.insertChar( c );
+                    Main.insertChar( ']' );
+                    Main.cursLeft();
+                    break;
+                case '{':
+                    Main.insertChar( c );
+                    Main.insertChar( '}' );
+                    Main.cursLeft();
+                    break;
+            }
+            return;
+        }
+	
+        Main.insertChar( c );
 	fprintf(stdout,"\033[?1000l");
 }
 
