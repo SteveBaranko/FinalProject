@@ -450,11 +450,13 @@ class Terminal
 				//addWarning( "BLEH" );
 				return;
 			}
-		
-			if ( cursorX == col )
-				horizOffset += tabLen;
 
 			cursorX = cursLinePos( (unsigned int) ind + 1 );
+
+			if (cursorX > col) {
+				horizOffset += tabLen;
+				cursorX = cursLinePos( (unsigned int) ind + 1 );
+			}
 
 			return;
 			// Debugging
@@ -622,7 +624,11 @@ class Terminal
 				return;
 			} 
 
-			// otherwise, move cursor to left and delete char
+			// if at end of screen, move horizontal offset back
+			if ( cursLinePos( ind ) == 1 )
+				horizOffset -= tabLen;
+
+			// otherwise, delete char and update cursorX
 			lines.at(cursRow).erase( ind-1, 1 );
 			cursorX = cursLinePos( ind-1 );
 
@@ -646,6 +652,10 @@ class Terminal
 			// if the cursor is at end of line
 			lines.at( cursRow ).insert( lines.at(cursRow).begin() + ind, c );
 			cursorX = cursLinePos( ind + 1 );
+			while ( cursorX > col ) {
+				horizOffset += tabLen;
+				cursorX = cursLinePos( ind + 1 );
+			}
 			return;
 		}
 
