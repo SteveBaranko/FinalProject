@@ -42,7 +42,7 @@ void getInput( Terminal& Main )
 	CIN.get(c);
         Main.addWarning( " " );
 	if (c == (char) 127) { Main.backspaceChar(); return; }
-	if (c == '~') { Main.deleteChar(); return; }
+	//if (c == '~') { Main.deleteChar(); return; }
 	if (c == (char) 13) { Main.addLine(); return; }
 	//if (c) Main.insertChar(c);
 	if (c == CTRL('q')) { 
@@ -89,6 +89,18 @@ void getInput( Terminal& Main )
 					break;
 				case 77:
 					Main.cursClick();
+					break;
+				case 51: // del key
+					Main.deleteChar();
+					CIN.get(c);
+					break;
+				case 53: // PgUp key
+					Main.pageUp();
+					CIN.get(c);
+					break;
+				case 54: // PgDn key
+					Main.pageDown();
+					CIN.get(c);
 					break;
 				default:
 					break;

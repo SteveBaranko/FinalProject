@@ -11,13 +11,9 @@
 int main(int argc, char* argv[]){
 
 	enableRawMode();
-	//setHandlers();
 
 	if (argc < 2) {
-		// FIx this, testing printing to terminal
-		// Eventually we will open an empty text
-		// editor.
-		COUT << "Too few arguments" << ENDL;
+		// no file given
 		return -1;
 	}
 
@@ -35,7 +31,7 @@ int main(int argc, char* argv[]){
         }
                 
 
-	VECTOR<STRING> lines;
+	//VECTOR<STRING> lines;
 	IFSTREAM inFile( argv[1] );
  
 	struct winsize w;	// create a struct winsize w, which will give terminal size
@@ -51,8 +47,6 @@ int main(int argc, char* argv[]){
 	//char c;
 
 	while (Main.isOpen()){
-		//CIN.get(c);
-		//if (c == 'q') Main.close();
 		getInput( Main );
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
 		Main.updateSize( w.ws_row, w.ws_col );
