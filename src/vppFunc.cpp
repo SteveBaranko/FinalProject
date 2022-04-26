@@ -61,12 +61,14 @@ void getInput( Terminal& Main )
             Main.checkParentheses();
 
             if ( Main.isBadP() ) {
-                return;
-            } else {
-                Main.save(); 
-		Main.addWarning( "Progress Saved." );
-                return;
+		CIN.get(c);
+	        if ( c != CTRL('s') )
+		    return;
             }
+            
+            Main.save(); 
+	    Main.addWarning( "Progress Saved." );
+            return;
         }
 	//if (c == 'p') Main.close();
 	//if (c == '\x1b') { Main.close(); return; }

@@ -422,18 +422,33 @@ class Terminal
                     STRING warning;
                     OSTRINGSTREAM warning_draft;
 
+                    bool comment = false;
+                    bool quote = false;
                     for ( size_t i = 0; i < lines.size(); ++i ) {
                         for ( size_t j = 0; j < lines[i].size(); ++j ) {
+                            // Comments and Quotes
+                            if ( lines[i][j] == '/' && lines[i][j] == '/' ) {
+                                comment = true;
+                                break;
+                            }
+                            
+                            if ( lines[i][j] == '"' ) quote = !quote;
+
+                            if ( quote ) continue;
+
+
                             // opening parenthesis
                             if ( ( lines[i][j] == '(' ) || ( lines[i][j] == '[' ) || ( lines[i][j] == '{' ) ) {
                                 temp = MAKE_TUPLE( lines[i][j], i, j ); 
                                 p_stack.push(temp);
+
+
                            // closing parenthesis
                             } else if ( lines[i][j] == ')' ) {
                                 // if no corresponding parenthesis
                                 if ( p_stack.empty() ) {
                                     bad_p = true;
-                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")" << " press CTRL^S again to save anyway.";
                                     warning = warning_draft.str();
                                     this->addWarning( warning );
                                     return;
@@ -441,7 +456,8 @@ class Terminal
                                 // If mismatched parenthesis
                                 if ( GET<0>(p_stack.top()) != '(' ) {
                                     bad_p = true;
-                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")" << " press CTRL^S again to save anyway.";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")";
                                     warning = warning_draft.str();
                                     this->addWarning( warning );
                                     return;
@@ -449,12 +465,12 @@ class Terminal
                                     p_stack.pop();
                                     continue;
                                 }
-                            // brackets
+                            // closing bracket
                             } else if ( lines[i][j] == ']' ) {
                                 // if no corresponding brackets
                                 if ( p_stack.empty() ) {
                                     bad_p = true;
-                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")" << " press CTRL^S again to save anyway.";
                                     warning = warning_draft.str();
                                     this->addWarning( warning );
                                     return;
@@ -462,7 +478,7 @@ class Terminal
                                 // if mismatched brackets
                                 if ( GET<0>(p_stack.top()) != '[' ) {
                                     bad_p = true;
-                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")" << " press CTRL^S again to save anyway.";
                                     warning = warning_draft.str();
                                     this->addWarning( warning );
                                     return;
@@ -470,12 +486,13 @@ class Terminal
                                     p_stack.pop();
                                     continue;
                                 }
-                            // curly braces
+
+                            // closing curly braces
                             } else if ( lines[i][j] == '}' ) {
                                 // if no corresponding braces
                                 if ( p_stack.empty() ) {
                                     bad_p = true;
-                                    warning_draft << "Error: Unmatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")" << " press CTRL^S again to save anyway.";
                                     warning = warning_draft.str();
                                     this->addWarning( warning );
                                     return;
@@ -483,7 +500,7 @@ class Terminal
                                 // if mismatched braces
                                 if ( GET<0>(p_stack.top()) != '{' ) {
                                     bad_p = true;
-                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i << ", " << j << ")";
+                                    warning_draft << "Error: Mismatched Parenthsis terminating at: (" << i + 1 << ", " << j << ")" << " press CTRL^S again to save anyway.";
                                     warning = warning_draft.str();
                                     this->addWarning( warning );
                                     return;
@@ -491,16 +508,20 @@ class Terminal
                                     p_stack.pop();
                                     continue;
                                 }
-                           // other (ie non parenthetical character)
+                           // other (ie non parenthetical, non-comma character)
                             } else {
                                 continue;
                             }
+                        }
+                        if ( comment ) {
+                            comment = false;
+                            continue;
                         }
                     }
                     // If unmatched open parenthesis
                     if ( !p_stack.empty() ) {
                         bad_p = true;
-                        warning_draft << "Error: Unmatched Parenthsis OPENING at: (" << GET<1>(p_stack.top()) << ", " << GET<2>(p_stack.top()) << ")";
+                        warning_draft << "Error: Unmatched Parenthsis OPENING at: (" << GET<1>(p_stack.top()) + 1 << ", " << GET<2>(p_stack.top()) << ")" << " press CTRL^S again to save anyway.";
                         warning = warning_draft.str();
                         this->addWarning( warning );
                         return;
