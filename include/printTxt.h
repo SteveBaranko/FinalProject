@@ -763,7 +763,7 @@ class Terminal
 				if ( cursRow > 0 ) {
 					cursUp();
 					cursRow = (unsigned int) cursorY-1+offset;
-					cursorX = (unsigned int) lineSize(lines.at(cursRow));
+					cursorX = (unsigned int) lineSize(lines.at(cursRow))+lineNumLen;
 
 					// delete space at end of line
 					lines.at(cursRow).erase( lines.at(cursRow).end()-1 );
