@@ -18,7 +18,6 @@
 #include<sstream>
 
 
-
 // C libraries to include
 #include<sys/ioctl.h>
 #include<unistd.h>
@@ -58,8 +57,9 @@ class Terminal
 		unsigned int horizOffset;
 		bool open;
 		bool dirty;
-                bool bad_p;
+    bool bad_p;
 		unsigned int tabLen;
+		unsigned int lineNumLen;
 		
 		// rn we are changing the line 
 		// so pass by value, not reference
@@ -71,13 +71,28 @@ class Terminal
 			
 			STRING word;
 
+			COUT << "\033[2K";
+			COUT << COLORS_NORMAL;
+
+ 	    //COUT << CSI << "48:5:166m" << line_num << COLORS_NORMAL << ' ';
+			COUT << CSI << "38;2;237;130;14m";
+			
+			STRSTREAM ss;
+			ss << line_num;
+			unsigned int spaceSize = (unsigned int) lineNumLen - (unsigned int) ss.str().size() - 1;
+
+			for (unsigned int i = 0; i < spaceSize; i++)
+				COUT << " ";
+
+			COUT << line_num << COLORS_NORMAL << " ";
+
 			// split each character in the line into a vector of words
 			VECTOR< STRING > words;
 			unsigned int prevGrp;
 			unsigned int currGrp;
 			// if the line is empty or if line is less than horizOffset, print nothing and exit function
 			if ( line.empty() || horizOffset > lineSize(line) ) {
-				COUT << "\033[2K";
+				//COUT << "\033[2K";
 				COUT << COLORS_NORMAL;
 				COUT << ENDL;
 				return;
@@ -94,7 +109,7 @@ class Terminal
 
 			// change this later, for now limit line to the size of the
 			// screen so it doesn't overflow
-			while ( col < (unsigned int) lineSize( line )) {
+			while ( col < (unsigned int) lineSize( line ) + lineNumLen) {
 				line = line.substr( 0 , line.size() - 1);
 			}
                         
@@ -127,8 +142,7 @@ class Terminal
 			unsigned int printSz = 0;
 			bool comment = false;
 			bool quotes = false;
-			COUT << "\033[2K";
-                        COUT << CSI << "48:5:166m" << line_num << COLORS_NORMAL << ' ';
+
 			// loop through each word in words
 			for ( STRING &wrd : words ) {
 				// if wrd is "//", this line is a comment
@@ -299,9 +313,9 @@ class Terminal
 				} else {
 					sz++;
 				}
-				if (sz == cursorX+horizOffset)
+				if (sz+lineNumLen == cursorX+horizOffset)
 					return i;
-				if (sz > cursorX+horizOffset)
+				if (sz+lineNumLen > cursorX+horizOffset)
 					return (unsigned int) i;
 			}
 			return (unsigned int) lines.at(cursorY-1+offset).size()-1;
@@ -338,7 +352,7 @@ class Terminal
 			unsigned int sz = 0;
 
 			if ( ind >= (unsigned int) lines.at(cursRow).size() )
-				return lineSize( lines.at(cursRow) );
+				return lineSize( lines.at(cursRow) ) + lineNumLen;
 
 			sz += 1;
 			for (unsigned int i = 1; i <= ind; i++) {
@@ -351,13 +365,13 @@ class Terminal
 					sz++;
 				}
 			}
-			return (unsigned int) sz - horizOffset;		
+			return (unsigned int) sz - horizOffset + lineNumLen;		
 		}
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ){ }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ) { }
 		~Terminal( ) { }
 
 		
@@ -368,6 +382,12 @@ class Terminal
 
 		void updateTerminal() {
 			//COUT << CLEAR_SCREEN;		// clear the screen
+
+			STRSTREAM ss;
+			ss << lines.size();
+			if ( ss.str().size() >= 3 )
+				lineNumLen = (unsigned int) ss.str().size() + 1;
+
 			COUT << CURS_HIDE;
 			COUT << CURS_TO_TOP;	// move cursor to top of terminal
 			for (unsigned int i = 0; i < (unsigned int) row-2; i++) {
@@ -385,8 +405,8 @@ class Terminal
 			//COUT << "\033[0;0H";	// move cursor to top of terminal
 			//COUT << CURS_TO_TOP;
 			COUT << CURS_SHOW;
-			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1)
-				COUT << "\033[" << cursorY << ";" << lineSize(lines.at(cursorY-1+offset))+1 << "H";
+			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1 + lineNumLen)
+				COUT << "\033[" << cursorY << ";" << lineSize(lines.at(cursorY-1+offset))+1+lineNumLen << "H";
 			else
 				COUT << "\033[" << cursorY << ";" << cursorX << "H";
 
@@ -518,6 +538,13 @@ class Terminal
 				createFile();
 
 			inFile.close();
+
+
+			STRSTREAM ss;
+			ss << lines.size();
+			if ( ss.str().size() >= 3 )
+				lineNumLen = (unsigned int) ss.str().size() + 1;
+			cursorX = lineNumLen + 1;
 		}
 
 		void createFile( ) {
@@ -589,8 +616,8 @@ class Terminal
 		void cursLeft( ) {
 			// if the cursor is beyond line, bring it back and return
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
-			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1) {
-				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset));
+			if (cursorX > (unsigned int) lineSize(lines.at(cursorY-1+offset)) + 1 + lineNumLen) {
+				cursorX = (unsigned int) lineSize(lines.at(cursorY-1+offset))+lineNumLen;
 				return;
 			}
 			
@@ -606,11 +633,11 @@ class Terminal
 			unsigned int ind = cursStrPos();
 			// if the index is 0, set cursor to left side of screen
 			if (ind == 0) {
-				cursorX = 0;
+				cursorX = 1+lineNumLen;
 				return;
 			}
 
-			if ( cursorX == 1 )
+			if ( cursorX == lineNumLen+1 )
 				horizOffset -= tabLen;
 
 			// set cursor to the char position to left
@@ -684,9 +711,20 @@ class Terminal
 					y=(unsigned int) row-2; // keeps cursor in usable space
 				cursorY=y; //sets cursor
 				x-=32;
-				if(x>(unsigned int)lineSize(lines.at(cursorY-1+offset))) 
-					x=(unsigned int)lineSize(lines.at(cursorY-1+offset)); //limits cursor to end of line
+				if(x>(unsigned int)lineSize(lines.at(cursorY-1+offset))+lineNumLen) 
+					x=(unsigned int)lineSize(lines.at(cursorY-1+offset))+lineNumLen; //limits cursor to end of line
+				if(x<lineNumLen)
+					x = lineNumLen+1;
 				cursorX=x;
+
+				unsigned int cursRow = (unsigned int) cursorY-1+offset;
+				// move horizontalOffset so that we can see the line we are editing
+				while ( horizOffset > lineSize( lines.at(cursRow) ) )
+					horizOffset -= tabLen;
+
+				// keep the cursor off space between tabs
+				unsigned int ind = cursStrPos();
+				cursorX = cursLinePos( ind );
 			}
 			else {
 				CIN.get(test); //flushes y output if x out of range
@@ -711,7 +749,7 @@ class Terminal
 				if ( cursRow > 0 ) {
 					lines.erase( lines.begin() + cursRow );
 					cursUp();
-					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1));
+					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1))+lineNumLen;
 					cursRight();
 				}
 				return;
@@ -731,7 +769,7 @@ class Terminal
 					lines.at(cursRow).erase( lines.at(cursRow).end()-1 );
 
 					if ( lines.at(cursRow).empty() )
-						cursorX = 1;
+						cursorX = lineNumLen+1;
 					lines.at(cursRow).append( lines.at(cursRow+1) );
 					lines.erase( lines.begin() + cursRow + 1);
 				}
@@ -739,7 +777,7 @@ class Terminal
 			} 
 
 			// if at end of screen, move horizontal offset back
-			if ( cursLinePos( ind ) == 1 )
+			if ( cursLinePos( ind ) == lineNumLen+1 )
 				horizOffset -= tabLen;
 
 			// otherwise, delete char and update cursorX
@@ -779,7 +817,7 @@ class Terminal
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 
 			// if the line is empty or at end of line, add empty line below
-			if ( lines.at( cursRow ).empty() || cursorX > lineSize( lines.at( cursRow ) ) ) {
+			if ( lines.at( cursRow ).empty() || cursorX > lineSize( lines.at( cursRow ) )+lineNumLen ) {
 				lines.insert( lines.begin() + cursRow + 1, " " );
 				cursDown();
 				return;
@@ -793,7 +831,7 @@ class Terminal
 
 			// move 
 			cursDown();
-			cursorX = 1;
+			cursorX = 1+lineNumLen;
 			horizOffset = 0;
 		}
 
