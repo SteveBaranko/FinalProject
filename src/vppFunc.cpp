@@ -57,6 +57,14 @@ void getInput( Terminal& Main )
 		Main.close(); 
 		return; 
 	}
+	if (c == CTRL('z')) {
+		Main.undo();
+		return;
+	}
+	if (c == CTRL('y')) {
+		Main.redo();
+		return;
+	}
 	if (c == CTRL('s')) {
             Main.checkParentheses();
 
