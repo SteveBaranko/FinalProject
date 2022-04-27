@@ -44,6 +44,8 @@ class Colors
 						colors["true"]= "38;2;205;0;205m"; //magenta
 						colors["false"]= "38;2;205;0;205m"; //magenta
 						colors["main"] = 		"38;2;0;255;127m"; // mint green
+						colors["switch"] = 		 "38;2;0;205;205m"; // blue
+						colors["case"] = "38;2;0;255;127m"; // mint green
         }
         ~Colors() { }
 

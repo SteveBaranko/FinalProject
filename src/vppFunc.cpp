@@ -40,7 +40,8 @@ void getInput( Terminal& Main )
 	char c;
 	fprintf(stdout,"\033[?1000h");
 	CIN.get(c);
-        Main.addWarning( " " );
+	fprintf(stdout,"\033[?25l");
+  Main.addWarning( " " );
 	if (c == (char) 127) { Main.backspaceChar(); return; }
 	//if (c == '~') { Main.deleteChar(); return; }
 	if (c == (char) 13) { Main.addLine(); return; }

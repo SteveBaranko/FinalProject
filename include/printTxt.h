@@ -572,6 +572,7 @@ class Terminal
 		void createFile( ) {
 			// create one empty string to start out with
 			lines.push_back( " " );
+			cursorX = lineNumLen + 1;
 		}
 
 		bool isOpen( ) {

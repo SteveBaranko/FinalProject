@@ -17,11 +17,14 @@ int main(int argc, char* argv[]){
 		return -1;
 	}
 
+	bool newFile = false;
 	// print error for not opening file
 	switch( check_permissions( argv[1] ) ) {
             case(-1):
-		COUT << "ERROR: File <"<< argv[1] << "> does not exist" << ENDL;
-                return -1;
+							newFile = true;
+							break;
+		//COUT << "ERROR: File <"<< argv[1] << "> does not exist" << ENDL;
+                //return -1;
             case(-2):
 		COUT << "ERROR: File <"<< argv[1] << "> is not accesible" << ENDL;
                 return -2;
@@ -31,15 +34,20 @@ int main(int argc, char* argv[]){
         }
                 
 
-	//VECTOR<STRING> lines;
-	IFSTREAM inFile( argv[1] );
  
 	struct winsize w;	// create a struct winsize w, which will give terminal size
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w); // obtain the size of the terminal window
 
 	Terminal Main( w.ws_row, w.ws_col, argv[1] );
 	//openFile( lines, inFile );
-	Main.openFile( inFile );
+	
+	if ( newFile ) {
+		Main.createFile();
+	} else {
+		//VECTOR<STRING> lines;
+		IFSTREAM inFile( argv[1] );
+		Main.openFile( inFile );
+	}
 
 	//print_terminal( lines );
 	Main.updateTerminal();
