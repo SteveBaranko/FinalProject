@@ -39,29 +39,28 @@ struct dllist{
 		dllist_node<T>*curr_node;
 
 		
-		void destructor( dllist_node<T>* curr_node ){
+		void destructor( dllist_node<T>* currNode ){
 			
 			// Base Case - End of the List
-			if( curr_node == NULL )
+			if( currNode == NULL )
 				return;
 			
 			// Recursive Case - Call the next node
-			destructor( curr_node->next_node );
+			destructor( currNode->next_node );
 			
-			// On the way back up - Delete the current node
-			delete curr_node;
+			// On the way back up - Delete the currNodeent node
+			delete currNode;
 		}
+
 	public:
 		
-		dllist<T>( ): head_node( NULL ), tail_node( NULL) {}
+		dllist<T>( ): head_node( NULL ), tail_node( NULL), curr_node( NULL ) {}
 
 		~dllist<T>() {
 			if( this->empty() )
 				return;
 
 			destructor( this->head_node );
-
-			delete curr_node;
 		}
 
 		bool empty() {
@@ -77,24 +76,24 @@ struct dllist{
 		T end() {
 			return this->tail_node->data;
 		}
-		T curr() {
-			return this->curr_node->data;
+		dllist_node<T>* curr() {
+			return this->curr_node;
 		}
-		void inc() {
-			if( empty() ) return;
+		bool inc() {
+			if( empty() ) return false;
 			if( this->curr_node == this->tail_node ){
-				return;
+				return false;
 			}
 				this->curr_node = this->curr_node->next_node;
-			return;
+			return true;
 		}
-		void dec() {
-			if( empty() ) return;
+		bool dec() {
+			if( empty() ) return false;
 			if( this->curr_node == head_node ){
-				return;
+				return false;
 			}
 				this->curr_node = this->curr_node->prev_node;
-			return;
+			return true;
 		}
 
 		void push_curr( const T& insert_val ){
@@ -126,7 +125,6 @@ struct dllist{
 			
 		}
 };
-
 
 
 #endif

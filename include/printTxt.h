@@ -17,7 +17,6 @@
 #include<tuple>
 #include<sstream>
 
-
 // C libraries to include
 #include<sys/ioctl.h>
 #include<unistd.h>
@@ -27,6 +26,7 @@
 #include "colors.h"
 #include "colorPrint.h"
 #include "readIn.h"
+#include "undoRedo.h"
 
 #define TUPLE std::tuple
 #define MAKE_TUPLE std::make_tuple
@@ -60,6 +60,7 @@ class Terminal
     bool bad_p;
 		unsigned int tabLen;
 		unsigned int lineNumLen;
+		undoRedo undoList;
 		
 		// rn we are changing the line 
 		// so pass by value, not reference
@@ -369,9 +370,9 @@ class Terminal
 		}
 
 	public:
-		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ) { }
-		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ) { }
-		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ) { }
+		Terminal( ): row( 0 ), col( 0 ), lines( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ), undoList( ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn ): row( rowIn ), col( colIn ), lines ( ), fileName( "" ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ), undoList( ) { }
+		Terminal( unsigned int rowIn, unsigned int colIn, STRING fileIn ): row( rowIn ), col( colIn ), lines ( ), fileName( fileIn ), cursorX( 1 ), cursorY( 1 ), offset( 0 ), horizOffset( 0 ), open( true ), dirty( false ), tabLen( 4 ), lineNumLen( 4 ), undoList( ) { }
 		~Terminal( ) { }
 
 		
@@ -657,6 +658,8 @@ class Terminal
 		}
 
 		void cursDown( ) {
+			// update undoList
+			undoList.makeClean();
 			if (cursorY < (unsigned int) row-2)
 				cursorY++;
 			else
@@ -677,6 +680,8 @@ class Terminal
 		}
 
 		void cursUp( ) {
+			// update undoList
+			undoList.makeClean();
 			if (cursorY > 1)
 				cursorY--;
 			else
@@ -694,6 +699,8 @@ class Terminal
 		}
 
 		void cursClick(){
+			// update undoList
+			undoList.makeClean();
 			unsigned int x=0,y=0;
 			struct winsize w;
 			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w); //gets window size
@@ -743,6 +750,15 @@ class Terminal
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 			dirty = true;
 
+			/*
+			// add line to undo/redo stack
+			// check if clean
+			if ( undoList.checkClean() ) {
+				undoList.makeDirty();
+				undoList.addNode( cursRow, lines.at(cursRow) );
+			} 
+			*/
+
 			if ( lines.at(cursRow).size() == 1) {
 				// if the line is empty, delete the row
 				// only delete row if it is not the first
@@ -790,6 +806,16 @@ class Terminal
 		void deleteChar( ) {
 			dirty = true;
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+
+			/*
+			// add line to undo/redo stack
+			// check if clean
+			if ( undoList.checkClean() ) {
+				undoList.makeDirty();
+				undoList.addNode( cursRow, lines.at(cursRow) );
+			} 
+			*/
+
 			unsigned int ind = cursStrPos();
 			if ( ind == (unsigned int) lines.at( cursRow ).size() - 1 )
 				return;
@@ -797,10 +823,18 @@ class Terminal
 		}
 
 		void insertChar( char c ) {
-			dirty = true;
 			// get the row of the cursor
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
 			unsigned int ind = cursStrPos();
+
+			// add line to undo/redo stack
+			// check if clean
+			if ( undoList.checkClean() ) {
+				undoList.makeDirty();
+				undoList.addNode( cursRow, lines.at(cursRow) );
+			} 
+
+			dirty = true;
 			// if the cursor is at end of line
 			lines.at( cursRow ).insert( lines.at(cursRow).begin() + ind, c );
 			cursorX = cursLinePos( ind + 1 );
@@ -815,6 +849,15 @@ class Terminal
 			dirty = true;
 			// add an extra vector to lines
 			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+
+			/*
+			// add line to undo/redo stack
+			// check if clean
+			if ( undoList.checkClean() ) {
+				undoList.makeDirty();
+				undoList.addNode( cursRow, lines.at(cursRow) );
+			} 
+			*/
 
 			// if the line is empty or at end of line, add empty line below
 			if ( lines.at( cursRow ).empty() || cursorX > lineSize( lines.at( cursRow ) )+lineNumLen ) {
@@ -836,6 +879,8 @@ class Terminal
 		}
 
 		void pageUp( ) {
+			// update undoList
+			undoList.makeClean();
 			// create an signed integer variable to check if offset goes negative
 			int overflowOffset = (int) offset;
 			// move the offset
@@ -850,6 +895,8 @@ class Terminal
 		}
 
 		void pageDown( ) {
+			// update undoList
+			undoList.makeClean();
 			// move the offset
 			offset += 10;
 			// keep cursor on available lines
@@ -860,6 +907,94 @@ class Terminal
 				cursorY = 1;
 				return;
 			}
+		}
+
+		void undo( ) {
+
+			bool check;
+			Line editLine;
+			check = undoList.getData( editLine );
+			undoList.makeClean();
+
+			if ( !check ) {
+				addWarning( "Already at oldest change" );
+				return;
+			}
+
+			//Line editLine = undoList.getData();
+			if ( lines.at( editLine.row ) == editLine.data ) {
+				undoList.prevNode();
+
+				check = undoList.getData( editLine );
+
+				if ( !check ) {
+					addWarning( "Already at oldest change" );
+					return;
+				}
+
+				lines.at( editLine.row ) = editLine.data;
+				
+				// move cursor to that row
+				if ( editLine.row < offset ) 
+					offset = editLine.row;
+				while ( editLine.row > (unsigned int) offset+row-2 )
+					offset++;
+				cursorY = (unsigned int) editLine.row - offset + 1;
+				unsigned int ind = cursStrPos();
+				cursorX = cursLinePos( ind );
+
+				return;
+			}
+
+			//unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			undoList.addNode( editLine.row, lines.at( editLine.row ) );
+			undoList.prevNode();
+
+			// move cursor to that row
+			if ( editLine.row < offset ) 
+				offset = editLine.row;
+			while ( editLine.row > (unsigned int) offset+row-2 )
+				offset++;
+			cursorY = (unsigned int) editLine.row - offset + 1;
+			unsigned int ind = cursStrPos();
+			cursorX = cursLinePos( ind );
+
+			lines.at( editLine.row ) = editLine.data;
+		}
+
+		void redo( ) {
+			if (undoList.checkClean() == false) {
+				addWarning( "No more redos to change" );
+				return;
+			}
+
+			bool check;
+			Line editLine;
+			check = undoList.nextNode();
+
+			if ( !check ) {
+				addWarning( "No more redos to change" );
+				return;
+			}
+
+			check = undoList.getData( editLine );
+
+			if ( !check ) {
+				addWarning( "No more redos to change" );
+				return;
+			}
+
+			lines.at( editLine.row ) = editLine.data;
+			//addWarning( editLine.data );
+
+			// move cursor to that row
+			if ( editLine.row < offset ) 
+				offset = editLine.row;
+			while ( editLine.row > (unsigned int) offset+row-2 )
+				offset++;
+			cursorY = (unsigned int) editLine.row - offset + 1;
+			unsigned int ind = cursStrPos();
+			cursorX = cursLinePos( ind );
 		}
 
 		void save( void ) {
