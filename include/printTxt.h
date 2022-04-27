@@ -681,7 +681,12 @@ class Terminal
 
 		void cursDown( ) {
 			// update undoList
-			undoList.makeClean();
+			if ( !undoList.checkClean() ) {
+				unsigned int lineRow = (unsigned int) cursorY - 1 + offset;
+				undoList.makeClean();
+				undoList.addNode( lineRow , lines.at( lineRow ) );
+			}
+
 			if (cursorY < (unsigned int) row-2)
 				cursorY++;
 			else
@@ -703,7 +708,12 @@ class Terminal
 
 		void cursUp( ) {
 			// update undoList
-			undoList.makeClean();
+			if ( !undoList.checkClean() ) {
+				unsigned int lineRow = (unsigned int) cursorY - 1 + offset;
+				undoList.makeClean();
+				undoList.addNode( lineRow , lines.at( lineRow ) );
+			}
+
 			if (cursorY > 1)
 				cursorY--;
 			else
@@ -722,7 +732,12 @@ class Terminal
 
 		void cursClick(){
 			// update undoList
-			undoList.makeClean();
+			if ( !undoList.checkClean() ) {
+				unsigned int lineRow = (unsigned int) cursorY - 1 + offset;
+				undoList.makeClean();
+				undoList.addNode( lineRow , lines.at( lineRow ) );
+			}
+
 			unsigned int x=0,y=0;
 			struct winsize w;
 			ioctl(STDOUT_FILENO,TIOCGWINSZ,&w); //gets window size
@@ -902,7 +917,12 @@ class Terminal
 
 		void pageUp( ) {
 			// update undoList
-			undoList.makeClean();
+			if ( !undoList.checkClean() ) {
+				unsigned int lineRow = (unsigned int) cursorY - 1 + offset;
+				undoList.makeClean();
+				undoList.addNode( lineRow , lines.at( lineRow ) );
+			}
+
 			// create an signed integer variable to check if offset goes negative
 			int overflowOffset = (int) offset;
 			// move the offset
@@ -918,7 +938,12 @@ class Terminal
 
 		void pageDown( ) {
 			// update undoList
-			undoList.makeClean();
+			if ( !undoList.checkClean() ) {
+				unsigned int lineRow = (unsigned int) cursorY - 1 + offset;
+				undoList.makeClean();
+				undoList.addNode( lineRow , lines.at( lineRow ) );
+			}
+
 			// move the offset
 			offset += 10;
 			// keep cursor on available lines
