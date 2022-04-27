@@ -66,6 +66,10 @@ void getInput( Terminal& Main )
 		Main.redo();
 		return;
 	}
+	if (c == CTRL('d')) {
+		//Main.debug();
+		return;
+	}
 	if (c == CTRL('s')) {
             Main.checkParentheses();
 

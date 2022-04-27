@@ -800,10 +800,12 @@ class Terminal
 				// if the line is empty, delete the row
 				// only delete row if it is not the first
 				if ( cursRow > 0 ) {
-					lines.erase( lines.begin() + cursRow );
+					//debug();
 					cursUp();
-					cursorX = (unsigned int) lineSize(lines.at(cursRow - 1))+lineNumLen;
-					cursRight();
+					lines.erase( lines.begin() + cursRow );
+					cursRow = (unsigned int) cursorY-1+offset;
+					cursorX = (unsigned int) lineSize(lines.at(cursRow))+lineNumLen;
+					//cursRight();
 				}
 				return;
 			} 
@@ -1064,6 +1066,22 @@ class Terminal
 				outLine.clear();
 			}
 			outFile.close();
+		}
+
+		void debug( ) {
+			STRSTREAM ss;
+			unsigned int cursRow = (unsigned int) cursorY-1+offset;
+			ss << "cursRow: " << cursRow;
+			addWarning( ss.str() );
+			return;
+			unsigned int ind = cursStrPos();
+			if ( !lines.at( cursRow ).empty() ) {
+				ss << lines.at( cursRow ).at( cursStrPos() );
+				ss << " ( " << cursStrPos() << " )";
+				ss << " | cursStrPos(): " << cursStrPos();
+				ss << " | cursLinePos(): " << cursLinePos( (unsigned int) ind-1 );
+				fileStatus( ss.str(), row );
+			}
 		}
 
 };
